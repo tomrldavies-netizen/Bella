@@ -3,8 +3,35 @@ import { Link } from 'react-router-dom'
 import { Elephant, Hippo, LionCub, Meerkat, Monkey, SavannaScene } from '../animals'
 import { Card, EmptyNote } from '../components/Card'
 import { ClipboardIcon, PencilIcon } from '../components/Icons'
+import { useReadyHousehold } from '../household/HouseholdContext'
+import { actualAgeLabel, correctedAgeLabel, dueDateLabel, ukToday } from '../lib/age'
 import { formatLongDate, greeting } from '../lib/dates'
 import { useNow } from '../lib/useNow'
+
+const pillClass =
+  'rounded-full bg-card px-2.5 py-[5px] text-xs font-bold text-ink no-underline hover:text-ink'
+
+/** Actual age, corrected age and due-date countdown; each opens Growth. */
+function AgePills({ now }: { now: Date }) {
+  const { baby } = useReadyHousehold()
+  const today = ukToday(now)
+  const due = dueDateLabel(baby.due_date, today)
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      <Link to="/growth" className={pillClass}>
+        {actualAgeLabel(baby.birth_date, today)}
+      </Link>
+      <Link to="/growth" className={pillClass}>
+        {correctedAgeLabel(baby.birth_date, baby.gestation_weeks, baby.gestation_days, today)}
+      </Link>
+      {due && (
+        <Link to="/growth" className={pillClass}>
+          {due}
+        </Link>
+      )}
+    </div>
+  )
+}
 
 function BellasPlanButton() {
   return (
@@ -20,15 +47,19 @@ function BellasPlanButton() {
 
 /** Phone header: savanna scene with Bella's name (Main.dc.html). */
 function PhoneHeader({ now }: { now: Date }) {
+  const { baby } = useReadyHousehold()
   return (
     <header className="relative h-[180px] overflow-hidden md:hidden">
       <SavannaScene className="absolute inset-0" />
       <div className="absolute top-[max(20px,env(safe-area-inset-top))] right-4">
         <BellasPlanButton />
       </div>
-      <div className="absolute top-[max(26px,env(safe-area-inset-top))] left-5 flex flex-col gap-0.5">
+      <div className="absolute top-[max(26px,env(safe-area-inset-top))] left-5 flex max-w-[55%] flex-col gap-0.5">
         <p className="m-0 text-sm font-bold text-ink-soft">{formatLongDate(now)}</p>
-        <h1 className="m-0 text-[42px] leading-[1.05] font-extrabold">Bella</h1>
+        <h1 className="m-0 truncate text-[42px] leading-[1.05] font-extrabold">{baby.name}</h1>
+        <div className="mt-1.5">
+          <AgePills now={now} />
+        </div>
       </div>
     </header>
   )
@@ -38,9 +69,12 @@ function PhoneHeader({ now }: { now: Date }) {
 function TabletHeader({ now }: { now: Date }) {
   return (
     <header className="hidden items-start justify-between gap-4 md:flex">
-      <div className="flex flex-col">
+      <div className="flex flex-col gap-1">
         <p className="m-0 text-sm font-bold text-ink-muted">{formatLongDate(now)}</p>
         <h1 className="m-0 text-[34px] leading-[1.1] font-extrabold">{greeting(now)}</h1>
+        <div className="[&_a]:border-[1.5px] [&_a]:border-line">
+          <AgePills now={now} />
+        </div>
       </div>
       <div className="rounded-full border-[1.5px] border-line">
         <BellasPlanButton />

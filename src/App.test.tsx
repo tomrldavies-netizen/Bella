@@ -1,15 +1,11 @@
-import { render, screen, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
-import { AppRoutes } from './App'
+import { AppRoutes, Gate } from './App'
+import { fakeAuth, fakeHousehold, renderWith } from './test/fakes'
 
 function renderAt(path: string) {
-  return render(
-    <MemoryRouter initialEntries={[path]}>
-      <AppRoutes />
-    </MemoryRouter>,
-  )
+  return renderWith(<AppRoutes />, { path })
 }
 
 describe('app shell', () => {
@@ -56,5 +52,56 @@ describe('app shell', () => {
     renderAt('/')
     expect(screen.queryByText(/50 ml/)).not.toBeInTheDocument()
     expect(screen.queryByText(/Iron/)).not.toBeInTheDocument()
+  })
+})
+
+describe('gate', () => {
+  it('explains when Supabase is not configured', () => {
+    renderWith(<Gate />, { auth: fakeAuth({ configured: false }) })
+    expect(screen.getByRole('heading', { name: 'Not connected yet' })).toBeInTheDocument()
+  })
+
+  it('asks a signed-out visitor to sign in', () => {
+    renderWith(<Gate />, { auth: fakeAuth({ session: null }) })
+    expect(screen.getByRole('heading', { name: 'Sign in' })).toBeInTheDocument()
+  })
+
+  it('shows setup when signed in without a household', () => {
+    renderWith(<Gate />, { household: fakeHousehold({ state: { status: 'none' } }) })
+    expect(screen.getByRole('heading', { name: 'About Bella' })).toBeInTheDocument()
+  })
+
+  it('shows a retry when loading fails', async () => {
+    const household = fakeHousehold({ state: { status: 'error', message: 'Network down' } })
+    renderWith(<Gate />, { household })
+    expect(screen.getByText('Network down')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Try again' }))
+    expect(household.reload).toHaveBeenCalled()
+  })
+
+  it('opens the app once the household is ready', () => {
+    renderWith(<Gate />)
+    expect(screen.getByRole('heading', { level: 1, name: 'Bella' })).toBeInTheDocument()
+  })
+})
+
+describe('household details', () => {
+  it('shows real age pills on Today', () => {
+    renderAt('/')
+    expect(screen.getAllByText(/ old$/).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/corrected$/).length).toBeGreaterThan(0)
+  })
+
+  it('shows members and sync status in the tablet rail', () => {
+    renderAt('/')
+    expect(screen.getAllByText('Dad').length).toBeGreaterThan(0)
+    expect(screen.getByRole('status')).toHaveTextContent('synced')
+  })
+
+  it('signs out from Bella\'s plan', async () => {
+    const auth = fakeAuth()
+    renderWith(<AppRoutes />, { path: '/bellas-plan', auth })
+    await userEvent.click(screen.getByRole('button', { name: 'Sign out' }))
+    expect(auth.signOut).toHaveBeenCalled()
   })
 })

@@ -1,6 +1,11 @@
 import { Link, useLocation } from 'react-router-dom'
 import { Elephant } from '../animals'
+import { useReadyHousehold } from '../household/HouseholdContext'
+import { correctedAgeLabel, ukToday } from '../lib/age'
 import { NAV_ITEMS, activeNavPath } from '../navigation'
+import { NamePill } from './NamePill'
+
+const SYNC_LABEL = { live: 'synced', connecting: 'connecting…', offline: 'offline' } as const
 
 /**
  * Tablet navigation (≥ 768 px). Compact (icon over label) on portrait
@@ -9,6 +14,7 @@ import { NAV_ITEMS, activeNavPath } from '../navigation'
 export function SideRail({ className = '' }: { className?: string }) {
   const { pathname } = useLocation()
   const active = activeNavPath(pathname, 'rail')
+  const { baby, members, sync } = useReadyHousehold()
   return (
     <nav
       aria-label="Main"
@@ -19,7 +25,12 @@ export function SideRail({ className = '' }: { className?: string }) {
         className="flex items-center justify-center gap-2.5 px-1.5 pb-[18px] text-ink no-underline hover:text-ink lg:justify-start"
       >
         <Elephant size={48} bg="#DCEBF2" />
-        <span className="hidden font-display text-[28px] leading-none font-extrabold lg:inline">Bella</span>
+        <span className="hidden min-w-0 flex-col lg:flex">
+          <span className="truncate font-display text-[28px] leading-none font-extrabold">{baby.name}</span>
+          <span className="text-xs font-bold text-ink-muted">
+            {correctedAgeLabel(baby.birth_date, baby.gestation_weeks, baby.gestation_days, ukToday())}
+          </span>
+        </span>
       </Link>
       <ul className="flex flex-col gap-1.5">
         {NAV_ITEMS.map(({ path, railLabel, Icon }) => {
@@ -42,6 +53,18 @@ export function SideRail({ className = '' }: { className?: string }) {
           )
         })}
       </ul>
+      <div className="mt-auto flex flex-wrap items-center justify-center gap-1.5 px-1.5 pt-4 lg:justify-start">
+        {members.map((m) => (
+          <NamePill key={m.id} member={m} className="hidden lg:inline" />
+        ))}
+        <span role="status" className="flex items-center gap-1.5 text-xs text-ink-muted">
+          <span
+            aria-hidden="true"
+            className={`h-2 w-2 rounded-full ${sync === 'live' ? 'bg-primary' : sync === 'offline' ? 'bg-alert' : 'bg-growth-accent'}`}
+          />
+          {SYNC_LABEL[sync]}
+        </span>
+      </div>
     </nav>
   )
 }
