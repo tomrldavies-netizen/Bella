@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>Bella – Edit feed plan</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&amp;family=Nunito:wght@400;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#3F6B4B}a:hover{color:#2F5239}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; background: #FBF6EC; font-family: Nunito, sans-serif; color: #3B3127; display: flex; flex-direction: column; overflow: hidden">
+
+<header style="flex-shrink: 0; background: #DCEBF2; border-radius: 0 0 28px 28px; padding: 10px 16px 14px; display: flex; flex-direction: column; gap: 4px">
+<a href="CarePlan.dc.html" style="align-self: flex-start; text-decoration: none; color: #3B3127; font-size: 14px; font-weight: 800; min-height: 40px; display: flex; align-items: center; gap: 4px"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>Bella's plan</a>
+<div style="display: flex; align-items: center; gap: 14px">
+<svg viewBox="0 0 44 44" width="50" height="50" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#FFFFFF"></circle><circle cx="11" cy="20" r="8" fill="#9DB8C9"></circle><circle cx="33" cy="20" r="8" fill="#9DB8C9"></circle><circle cx="22" cy="21" r="10" fill="#B7CEDB"></circle><path d="M22 26 q0 8 -5 10" stroke="#B7CEDB" stroke-width="5" fill="none" stroke-linecap="round"></path><circle cx="18.5" cy="19" r="1.4" fill="#3B3127"></circle><circle cx="25.5" cy="19" r="1.4" fill="#3B3127"></circle></svg>
+<div style="flex: 1; display: flex; flex-direction: column">
+<h1 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 28px; line-height: 1.1; font-weight: 800">Feed plan</h1>
+<div style="font-size: 13px; font-weight: 600; color: #4A4037">Starts from the next feed (00:00)</div>
+</div>
+</div>
+</header>
+
+<div style="flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 12px 16px 0">
+
+<div style="display: flex; align-items: center; justify-content: space-between; background: #FFFFFF; border: 1.5px solid #EFE4D2; border-radius: 14px; padding: 8px 12px">
+<span style="font-size: 13px; font-weight: 700; color: #4A4037">Day total</span>
+<span style="font-family: 'Baloo 2', sans-serif; font-size: 20px; font-weight: 800">{{ total }} ml</span>
+<span style="font-size: 12px; font-weight: 700; color: #4A4037">{{ breastCount }} breast · {{ formulaCount }} formula · {{ mixCount }} mix</span>
+</div>
+
+<div style="display: flex; align-items: center; gap: 8px">
+<span style="font-size: 13px; font-weight: 800">Set all to</span>
+<button type="button" onClick="{{ allBreast }}" style="font-family: Nunito, sans-serif; font-size: 13px; font-weight: 800; color: #3B3127; background: #DCEBF2; border: 1.5px solid #7FA9C1; border-radius: 999px; padding: 0 12px; height: 40px">Breast milk</button>
+<button type="button" onClick="{{ allFormula }}" style="font-family: Nunito, sans-serif; font-size: 13px; font-weight: 800; color: #3B3127; background: #FBF0CF; border: 1.5px solid #D9B45A; border-radius: 999px; padding: 0 12px; height: 40px">Formula</button>
+<span style="margin-left: auto; font-size: 12px; font-weight: 700; color: #4A4037">every 3 hrs</span>
+</div>
+
+<div style="background: #FFFFFF; border: 1.5px solid #EFE4D2; border-radius: 18px; padding: 2px 12px; display: flex; flex-direction: column">
+<sc-for list="{{ slots }}" as="item" hint-placeholder-count="8">
+<div style="display: flex; align-items: center; gap: 10px; height: 50px; border-bottom: 1px solid #F3EADC">
+<span style="width: 46px; font-size: 14px; font-weight: 800">{{ item.t }}</span>
+<sc-if value="{{ item.isBreast }}" hint-placeholder-val="{{ true }}">
+<button type="button" onClick="{{ item.cycle }}" aria-label="Milk type, tap to change" style="flex: 1; font-family: Nunito, sans-serif; font-size: 13px; font-weight: 800; color: #3B3127; background: #DCEBF2; border: 1.5px solid #7FA9C1; border-radius: 12px; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 10px">Breast milk<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4l-3 3 3 3M4 7h13M17 20l3-3-3-3M20 17H7"></path></svg></button>
+</sc-if>
+<sc-if value="{{ item.isFormula }}" hint-placeholder-val="{{ false }}">
+<button type="button" onClick="{{ item.cycle }}" aria-label="Milk type, tap to change" style="flex: 1; font-family: Nunito, sans-serif; font-size: 13px; font-weight: 800; color: #3B3127; background: #FBF0CF; border: 1.5px solid #D9B45A; border-radius: 12px; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 10px">Formula<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4l-3 3 3 3M4 7h13M17 20l3-3-3-3M20 17H7"></path></svg></button>
+</sc-if>
+<sc-if value="{{ item.isMix }}" hint-placeholder-val="{{ false }}">
+<button type="button" onClick="{{ item.cycle }}" aria-label="Milk type, tap to change" style="flex: 1; font-family: Nunito, sans-serif; font-size: 13px; font-weight: 800; color: #3B3127; background: #ECE4F5; border: 1.5px solid #A994C4; border-radius: 12px; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 10px">Mix (half each)<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4l-3 3 3 3M4 7h13M17 20l3-3-3-3M20 17H7"></path></svg></button>
+</sc-if>
+<div style="display: flex; align-items: center; gap: 4px">
+<button type="button" onClick="{{ item.less }}" aria-label="5 ml less" style="width: 36px; height: 36px; border-radius: 50%; border: 0; background: #F3EADC; font-size: 18px; font-weight: 800; color: #3B3127">−</button>
+<span style="width: 52px; text-align: center; font-family: 'Baloo 2', sans-serif; font-size: 18px; font-weight: 800">{{ item.ml }} ml</span>
+<button type="button" onClick="{{ item.more }}" aria-label="5 ml more" style="width: 36px; height: 36px; border-radius: 50%; border: 0; background: #F3EADC; font-size: 18px; font-weight: 800; color: #3B3127">+</button>
+</div>
+</div>
+</sc-for>
+<button type="button" style="font-family: Nunito, sans-serif; font-size: 13px; font-weight: 800; color: #3F6B4B; background: transparent; border: 0; height: 40px; text-align: left">+ Add or move a feed time</button>
+</div>
+</div>
+
+<div style="flex-shrink: 0; padding: 10px 16px 18px; background: #FFFFFF; border-top: 1.5px solid #EFE4D2; display: flex; flex-direction: column; gap: 8px">
+<button type="button" aria-pressed="true" style="font-family: Nunito, sans-serif; font-size: 14px; font-weight: 700; color: #3B3127; background: transparent; border: 0; min-height: 40px; display: flex; align-items: center; gap: 10px; padding: 0"><span style="width: 40px; height: 24px; border-radius: 999px; background: #3F6B4B; display: flex; justify-content: flex-end; padding: 3px; box-sizing: border-box"><span style="width: 18px; height: 18px; border-radius: 50%; background: #FFFFFF"></span></span>Tell everyone about this change</button>
+<button type="button" style="font-family: 'Baloo 2', sans-serif; font-size: 18px; font-weight: 800; color: #FFFFFF; background: #3F6B4B; border: 0; border-radius: 16px; height: 52px">Save feed plan</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  defaults() {
+    return [
+      { t: '00:00', milk: 'breast', ml: 50 },
+      { t: '03:00', milk: 'breast', ml: 50 },
+      { t: '06:00', milk: 'formula', ml: 50 },
+      { t: '09:00', milk: 'breast', ml: 50 },
+      { t: '12:00', milk: 'breast', ml: 55 },
+      { t: '15:00', milk: 'formula', ml: 50 },
+      { t: '18:00', milk: 'breast', ml: 50 },
+      { t: '21:00', milk: 'breast', ml: 50 }
+    ];
+  }
+  getSlots() {
+    var s = this.state;
+    return (s && s.slots) ? s.slots : this.defaults();
+  }
+  update(i, patch) {
+    var slots = this.getSlots().map(function (x, j) { return j === i ? Object.assign({}, x, patch) : x; });
+    this.setState({ slots: slots });
+  }
+  setAll(milk) {
+    var slots = this.getSlots().map(function (x) { return Object.assign({}, x, { milk: milk }); });
+    this.setState({ slots: slots });
+  }
+  renderVals() {
+    var self = this;
+    var order = ['breast', 'formula', 'mix'];
+    var slots = this.getSlots();
+    var total = 0, b = 0, f = 0, m = 0;
+    var items = slots.map(function (x, i) {
+      total += x.ml;
+      if (x.milk === 'breast') b++; else if (x.milk === 'formula') f++; else m++;
+      return {
+        t: x.t,
+        ml: x.ml,
+        isBreast: x.milk === 'breast',
+        isFormula: x.milk === 'formula',
+        isMix: x.milk === 'mix',
+        cycle: function () { self.update(i, { milk: order[(order.indexOf(x.milk) + 1) % 3] }); },
+        less: function () { self.update(i, { ml: Math.max(0, x.ml - 5) }); },
+        more: function () { self.update(i, { ml: x.ml + 5 }); }
+      };
+    });
+    return {
+      slots: items,
+      total: total,
+      breastCount: b,
+      formulaCount: f,
+      mixCount: m,
+      allBreast: function () { self.setAll('breast'); },
+      allFormula: function () { self.setAll('formula'); }
+    };
+  }
+}
+</script>
+</body>
+</html>

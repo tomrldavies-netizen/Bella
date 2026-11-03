@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>Bella – Edit exercises</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&amp;family=Nunito:wght@400;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#3F6B4B}a:hover{color:#2F5239}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; background: #FBF6EC; font-family: Nunito, sans-serif; color: #3B3127; display: flex; flex-direction: column; overflow: hidden">
+
+<header style="flex-shrink: 0; background: #DDF0EE; border-radius: 0 0 28px 28px; padding: 10px 16px 14px; display: flex; flex-direction: column; gap: 4px">
+<a href="CarePlan.dc.html" style="align-self: flex-start; text-decoration: none; color: #3B3127; font-size: 14px; font-weight: 800; min-height: 40px; display: flex; align-items: center; gap: 4px"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>Bella's plan</a>
+<div style="display: flex; align-items: center; gap: 14px">
+<svg viewBox="0 0 44 44" width="50" height="50" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#FFFFFF"></circle><circle cx="19" cy="23" r="11" fill="#8CC5BC"></circle><ellipse cx="16" cy="29" rx="6" ry="3.5" fill="#B7DDD6"></ellipse><path d="M27 19 q12 0 13 8 q-6 -3 -13 0z" fill="#F2C46D"></path><path d="M27 18 q6 -4 11 0 q-5 -1 -11 2z" fill="#E9A06B"></path><circle cx="21" cy="20" r="1.6" fill="#3B3127"></circle><path d="M14 12 q2 -4 5 -1" stroke="#6FA89F" stroke-width="2" fill="none" stroke-linecap="round"></path></svg>
+<div style="flex: 1; display: flex; flex-direction: column">
+<h1 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 28px; line-height: 1.1; font-weight: 800">Exercises</h1>
+<div style="font-size: 13px; font-weight: 600; color: #4A4037">Copy them from the therapist's sheet</div>
+</div>
+</div>
+</header>
+
+<div style="flex: 1; display: flex; flex-direction: column; gap: 12px; padding: 12px 16px 0">
+
+<sc-if value="{{ isSalt }}" hint-placeholder-val="{{ true }}">
+<div role="tablist" aria-label="Exercise type" style="display: flex; gap: 6px; background: #F6EFE3; border-radius: 14px; padding: 4px">
+<button type="button" role="tab" aria-selected="false" onClick="{{ pickPhysio }}" style="flex: 1; font-family: Nunito, sans-serif; font-size: 14px; font-weight: 700; color: #4A4037; background: transparent; border: 0; border-radius: 10px; height: 42px">Physio</button>
+<button type="button" role="tab" aria-selected="true" onClick="{{ pickSalt }}" style="flex: 1; font-family: Nunito, sans-serif; font-size: 14px; font-weight: 800; color: #3B3127; background: #DDF0EE; border: 1.5px solid #6FA89F; border-radius: 10px; height: 42px">Speech &amp; language</button>
+</div>
+
+<div style="background: #FFFFFF; border: 2px solid #8CC5BC; border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="ex-name" style="font-size: 13px; font-weight: 800">Exercise</label>
+<input id="ex-name" type="text" value="Cheek and lip strokes" style="font-family: Nunito, sans-serif; font-size: 15px; color: #3B3127; background: #F9F4EA; border: 1.5px solid #EFE4D2; border-radius: 12px; height: 44px; padding: 0 12px">
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; font-weight: 800">How to do it</span>
+<div style="display: flex; align-items: center; gap: 8px"><span style="width: 24px; height: 24px; border-radius: 50%; background: #DDF0EE; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0">1</span><input type="text" aria-label="Step 1" value="Bella calm and awake, hands washed" style="flex: 1; min-width: 0; font-family: Nunito, sans-serif; font-size: 14px; color: #3B3127; background: #F9F4EA; border: 1.5px solid #EFE4D2; border-radius: 10px; height: 40px; padding: 0 10px"></div>
+<div style="display: flex; align-items: center; gap: 8px"><span style="width: 24px; height: 24px; border-radius: 50%; background: #DDF0EE; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0">2</span><input type="text" aria-label="Step 2" value="[Step from the therapist's sheet]" style="flex: 1; min-width: 0; font-family: Nunito, sans-serif; font-size: 14px; color: #3B3127; background: #F9F4EA; border: 1.5px solid #EFE4D2; border-radius: 10px; height: 40px; padding: 0 10px"></div>
+<div style="display: flex; align-items: center; gap: 8px"><span style="width: 24px; height: 24px; border-radius: 50%; background: #DDF0EE; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0">3</span><input type="text" aria-label="Step 3" value="Stop if she turns away or seems upset" style="flex: 1; min-width: 0; font-family: Nunito, sans-serif; font-size: 14px; color: #3B3127; background: #F9F4EA; border: 1.5px solid #EFE4D2; border-radius: 10px; height: 40px; padding: 0 10px"></div>
+<button type="button" style="align-self: flex-start; font-family: Nunito, sans-serif; font-size: 13px; font-weight: 800; color: #3F6B4B; background: transparent; border: 0; height: 32px; padding: 0">+ Add a step</button>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between">
+<span style="font-size: 13px; font-weight: 800">How often</span>
+<div style="display: flex; align-items: center; gap: 6px">
+<button type="button" aria-label="Fewer times a day" style="width: 40px; height: 40px; border-radius: 50%; border: 0; background: #F3EADC; font-size: 20px; font-weight: 800; color: #3B3127">−</button>
+<span style="min-width: 110px; text-align: center; font-family: 'Baloo 2', sans-serif; font-size: 18px; font-weight: 800">3 times a day</span>
+<button type="button" aria-label="More times a day" style="width: 40px; height: 40px; border-radius: 50%; border: 0; background: #F3EADC; font-size: 20px; font-weight: 800; color: #3B3127">+</button>
+</div>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 6px">
+<button type="button" style="font-family: Nunito, sans-serif; color: #3B3127; background: #FFFFFF; border: 1.5px solid #EFE4D2; border-radius: 16px; height: 52px; padding: 0 12px; display: flex; align-items: center; justify-content: space-between; text-align: left"><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 800">Dummy sucking</span><span style="font-size: 12px; color: #5C5146">During each tube feed</span></span><span style="font-size: 13px; font-weight: 800; color: #3F6B4B">Edit</span></button>
+<button type="button" style="font-family: Nunito, sans-serif; color: #3B3127; background: #FFFFFF; border: 1.5px solid #EFE4D2; border-radius: 16px; height: 52px; padding: 0 12px; display: flex; align-items: center; justify-content: space-between; text-align: left"><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 800">Face-to-face talking time</span><span style="font-size: 12px; color: #5C5146">4 times a day</span></span><span style="font-size: 13px; font-weight: 800; color: #3F6B4B">Edit</span></button>
+</div>
+<button type="button" style="font-family: Nunito, sans-serif; font-size: 14px; font-weight: 800; color: #3B3127; background: transparent; border: 1.5px dashed #8CC5BC; border-radius: 14px; height: 44px">+ Add speech &amp; language exercise</button>
+</sc-if>
+
+<sc-if value="{{ isPhysio }}" hint-placeholder-val="{{ false }}">
+<div role="tablist" aria-label="Exercise type" style="display: flex; gap: 6px; background: #F6EFE3; border-radius: 14px; padding: 4px">
+<button type="button" role="tab" aria-selected="true" onClick="{{ pickPhysio }}" style="flex: 1; font-family: Nunito, sans-serif; font-size: 14px; font-weight: 800; color: #3B3127; background: #F8E1E4; border: 1.5px solid #B5677D; border-radius: 10px; height: 42px">Physio</button>
+<button type="button" role="tab" aria-selected="false" onClick="{{ pickSalt }}" style="flex: 1; font-family: Nunito, sans-serif; font-size: 14px; font-weight: 700; color: #4A4037; background: transparent; border: 0; border-radius: 10px; height: 42px">Speech &amp; language</button>
+</div>
+
+<div style="background: #FFFFFF; border: 2px solid #D98CA0; border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="px-name" style="font-size: 13px; font-weight: 800">Exercise</label>
+<input id="px-name" type="text" value="Hip and leg stretches" style="font-family: Nunito, sans-serif; font-size: 15px; color: #3B3127; background: #F9F4EA; border: 1.5px solid #EFE4D2; border-radius: 12px; height: 44px; padding: 0 12px">
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; font-weight: 800">How to do it</span>
+<div style="display: flex; align-items: center; gap: 8px"><span style="width: 24px; height: 24px; border-radius: 50%; background: #F8E1E4; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0">1</span><input type="text" aria-label="Step 1" value="On her back on a firm, flat surface" style="flex: 1; min-width: 0; font-family: Nunito, sans-serif; font-size: 14px; color: #3B3127; background: #F9F4EA; border: 1.5px solid #EFE4D2; border-radius: 10px; height: 40px; padding: 0 10px"></div>
+<div style="display: flex; align-items: center; gap: 8px"><span style="width: 24px; height: 24px; border-radius: 50%; background: #F8E1E4; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0">2</span><input type="text" aria-label="Step 2" value="[Step from the physio sheet]" style="flex: 1; min-width: 0; font-family: Nunito, sans-serif; font-size: 14px; color: #3B3127; background: #F9F4EA; border: 1.5px solid #EFE4D2; border-radius: 10px; height: 40px; padding: 0 10px"></div>
+<div style="display: flex; align-items: center; gap: 8px"><span style="width: 24px; height: 24px; border-radius: 50%; background: #F8E1E4; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0">3</span><input type="text" aria-label="Step 3" value="Repeat 5 times, stop if she's unhappy" style="flex: 1; min-width: 0; font-family: Nunito, sans-serif; font-size: 14px; color: #3B3127; background: #F9F4EA; border: 1.5px solid #EFE4D2; border-radius: 10px; height: 40px; padding: 0 10px"></div>
+<button type="button" style="align-self: flex-start; font-family: Nunito, sans-serif; font-size: 13px; font-weight: 800; color: #3F6B4B; background: transparent; border: 0; height: 32px; padding: 0">+ Add a step</button>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between">
+<span style="font-size: 13px; font-weight: 800">How often</span>
+<div style="display: flex; align-items: center; gap: 6px">
+<button type="button" aria-label="Fewer times a day" style="width: 40px; height: 40px; border-radius: 50%; border: 0; background: #F3EADC; font-size: 20px; font-weight: 800; color: #3B3127">−</button>
+<span style="min-width: 110px; text-align: center; font-family: 'Baloo 2', sans-serif; font-size: 18px; font-weight: 800">3 times a day</span>
+<button type="button" aria-label="More times a day" style="width: 40px; height: 40px; border-radius: 50%; border: 0; background: #F3EADC; font-size: 20px; font-weight: 800; color: #3B3127">+</button>
+</div>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 6px">
+<button type="button" style="font-family: Nunito, sans-serif; color: #3B3127; background: #FFFFFF; border: 1.5px solid #EFE4D2; border-radius: 16px; height: 52px; padding: 0 12px; display: flex; align-items: center; justify-content: space-between; text-align: left"><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 800">Side-lying play</span><span style="font-size: 12px; color: #5C5146">5 min · 2 times a day</span></span><span style="font-size: 13px; font-weight: 800; color: #3F6B4B">Edit</span></button>
+<button type="button" style="font-family: Nunito, sans-serif; color: #3B3127; background: #FFFFFF; border: 1.5px solid #EFE4D2; border-radius: 16px; height: 52px; padding: 0 12px; display: flex; align-items: center; justify-content: space-between; text-align: left"><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 800">Tummy time</span><span style="font-size: 12px; color: #5C5146">Goal 30 min a day</span></span><span style="font-size: 13px; font-weight: 800; color: #3F6B4B">Edit</span></button>
+</div>
+<button type="button" style="font-family: Nunito, sans-serif; font-size: 14px; font-weight: 800; color: #3B3127; background: transparent; border: 1.5px dashed #D98CA0; border-radius: 14px; height: 44px">+ Add physio exercise</button>
+</sc-if>
+</div>
+
+<div style="flex-shrink: 0; padding: 10px 16px 18px; background: #FFFFFF; border-top: 1.5px solid #EFE4D2; display: flex; flex-direction: column; gap: 8px">
+<button type="button" aria-pressed="true" style="font-family: Nunito, sans-serif; font-size: 14px; font-weight: 700; color: #3B3127; background: transparent; border: 0; min-height: 40px; display: flex; align-items: center; gap: 10px; padding: 0"><span style="width: 40px; height: 24px; border-radius: 999px; background: #3F6B4B; display: flex; justify-content: flex-end; padding: 3px; box-sizing: border-box"><span style="width: 18px; height: 18px; border-radius: 50%; background: #FFFFFF"></span></span>Tell everyone about this change</button>
+<button type="button" style="font-family: 'Baloo 2', sans-serif; font-size: 18px; font-weight: 800; color: #FFFFFF; background: #3F6B4B; border: 0; border-radius: 16px; height: 52px">Save exercise</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var tab = (this.state && this.state.tab) ? this.state.tab : 'salt';
+    return {
+      isSalt: tab === 'salt',
+      isPhysio: tab === 'physio',
+      pickSalt: function () { self.setState({ tab: 'salt' }); },
+      pickPhysio: function () { self.setState({ tab: 'physio' }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

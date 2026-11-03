@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>Bella – Feeds</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&amp;family=Nunito:wght@400;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#3F6B4B}a:hover{color:#2F5239}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; background: #FBF6EC; font-family: Nunito, sans-serif; color: #3B3127; display: flex; flex-direction: column; overflow: hidden">
+
+<header style="flex-shrink: 0; background: #DCEBF2; border-radius: 0 0 28px 28px; padding: 26px 20px 18px; display: flex; align-items: center; gap: 14px">
+<svg viewBox="0 0 44 44" width="56" height="56" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#FFFFFF"></circle><circle cx="11" cy="20" r="8" fill="#9DB8C9"></circle><circle cx="33" cy="20" r="8" fill="#9DB8C9"></circle><circle cx="22" cy="21" r="10" fill="#B7CEDB"></circle><path d="M22 26 q0 8 -5 10" stroke="#B7CEDB" stroke-width="5" fill="none" stroke-linecap="round"></path><circle cx="18.5" cy="19" r="1.4" fill="#3B3127"></circle><circle cx="25.5" cy="19" r="1.4" fill="#3B3127"></circle><circle cx="15.5" cy="24" r="1.7" fill="#F4C3B2"></circle><circle cx="28.5" cy="24" r="1.7" fill="#F4C3B2"></circle></svg>
+<div style="flex: 1; display: flex; flex-direction: column">
+<h1 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 30px; line-height: 1.1; font-weight: 800">Feeds</h1>
+<div style="font-size: 13px; font-weight: 600; color: #4A4037">21:00 plan: 50 ml breast milk · next 00:00</div>
+</div>
+<button type="button" style="font-family: Nunito, sans-serif; font-size: 12px; font-weight: 800; color: #3B3127; background: #FFFFFF; border: 0; border-radius: 999px; padding: 8px 12px; min-height: 44px">Expressing</button>
+</header>
+
+<div style="flex: 1; display: flex; flex-direction: column; gap: 12px; padding: 14px 16px 0">
+
+<section style="background: #FFFFFF; border: 1.5px solid #EFE4D2; border-radius: 20px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between">
+<div style="display: flex; flex-direction: column">
+<span style="font-size: 13px; font-weight: 700; color: #5C5146">Feed timer · started 21:00</span>
+<span style="font-family: 'Baloo 2', sans-serif; font-size: 38px; font-weight: 800; line-height: 1.1">08:42</span>
+</div>
+<div style="display: flex; gap: 8px">
+<button type="button" style="font-family: Nunito, sans-serif; font-size: 14px; font-weight: 800; color: #3B3127; background: #F3EADC; border: 0; border-radius: 14px; padding: 0 14px; height: 44px">Pause</button>
+<button type="button" style="font-family: Nunito, sans-serif; font-size: 14px; font-weight: 800; color: #FFFFFF; background: #3F6B4B; border: 0; border-radius: 14px; padding: 0 14px; height: 44px">Finish</button>
+</div>
+</section>
+
+<section style="background: #FFFFFF; border: 1.5px solid #EFE4D2; border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 18px; font-weight: 700">How was it given?</h2>
+<div style="display: flex; gap: 6px; background: #F6EFE3; border-radius: 14px; padding: 4px">
+<button type="button" aria-pressed="false" style="flex: 1; font-family: Nunito, sans-serif; font-size: 13px; font-weight: 700; color: #4A4037; background: transparent; border: 0; border-radius: 10px; height: 40px">Tube only</button>
+<button type="button" aria-pressed="true" style="flex: 1; font-family: Nunito, sans-serif; font-size: 13px; font-weight: 800; color: #3B3127; background: #DCEBF2; border: 1.5px solid #7FA9C1; border-radius: 10px; height: 40px">Bottle + tube</button>
+<button type="button" aria-pressed="false" style="flex: 1; font-family: Nunito, sans-serif; font-size: 13px; font-weight: 700; color: #4A4037; background: transparent; border: 0; border-radius: 10px; height: 40px">Breast + tube</button>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<div style="background: #F9F4EA; border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 12px; font-weight: 700; color: #5C5146">By mouth</span>
+<div style="display: flex; align-items: center; justify-content: space-between">
+<button type="button" aria-label="Less by mouth" style="width: 36px; height: 36px; border-radius: 50%; border: 0; background: #FFFFFF; font-size: 20px; font-weight: 800; color: #3B3127">−</button>
+<span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; font-weight: 800">15 ml</span>
+<button type="button" aria-label="More by mouth" style="width: 36px; height: 36px; border-radius: 50%; border: 0; background: #FFFFFF; font-size: 20px; font-weight: 800; color: #3B3127">+</button>
+</div>
+</div>
+<div style="background: #F9F4EA; border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 12px; font-weight: 700; color: #5C5146">Via tube</span>
+<div style="display: flex; align-items: center; justify-content: space-between">
+<button type="button" aria-label="Less via tube" style="width: 36px; height: 36px; border-radius: 50%; border: 0; background: #FFFFFF; font-size: 20px; font-weight: 800; color: #3B3127">−</button>
+<span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; font-weight: 800">35 ml</span>
+<button type="button" aria-label="More via tube" style="width: 36px; height: 36px; border-radius: 50%; border: 0; background: #FFFFFF; font-size: 20px; font-weight: 800; color: #3B3127">+</button>
+</div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 700"><span>50 of 50 ml</span><span style="color: #5C5146">30% by mouth</span></div>
+<div style="height: 10px; border-radius: 999px; background: #EFE4D2; display: flex; overflow: hidden">
+<div style="width: 30%; background: #E9A06B"></div>
+<div style="width: 70%; background: #7FA9C1"></div>
+</div>
+</div>
+</section>
+
+<section style="display: flex; gap: 8px; align-items: center">
+<span style="font-size: 13px; font-weight: 800; width: 56px">Milk</span>
+<button type="button" aria-pressed="true" style="font-family: Nunito, sans-serif; font-size: 13px; font-weight: 800; color: #3B3127; background: #DCEBF2; border: 1.5px solid #7FA9C1; border-radius: 999px; padding: 0 14px; height: 40px">Breast milk</button>
+<button type="button" aria-pressed="false" style="font-family: Nunito, sans-serif; font-size: 13px; font-weight: 700; color: #4A4037; background: #FFFFFF; border: 1.5px solid #EFE4D2; border-radius: 999px; padding: 0 14px; height: 40px">Formula</button>
+<button type="button" aria-pressed="true" style="margin-left: auto; font-family: Nunito, sans-serif; font-size: 13px; font-weight: 800; color: #3B3127; background: #FFFFFF; border: 1.5px solid #EFE4D2; border-radius: 999px; padding: 0 10px 0 6px; height: 40px; display: flex; align-items: center; gap: 6px"><span style="width: 26px; height: 16px; border-radius: 999px; background: #3F6B4B; display: flex; justify-content: flex-end; padding: 2px; box-sizing: border-box"><span style="width: 12px; height: 12px; border-radius: 50%; background: #FFFFFF"></span></span>Fortifier</button>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 800">Sick or reflux?</span>
+<div style="display: flex; gap: 8px">
+<button type="button" aria-pressed="true" style="flex: 1; font-family: Nunito, sans-serif; font-size: 13px; font-weight: 800; color: #3B3127; background: #E3EFE4; border: 1.5px solid #8DB596; border-radius: 12px; height: 40px">None</button>
+<button type="button" aria-pressed="false" style="flex: 1; font-family: Nunito, sans-serif; font-size: 13px; font-weight: 700; color: #4A4037; background: #FFFFFF; border: 1.5px solid #EFE4D2; border-radius: 12px; height: 40px">Posset</button>
+<button type="button" aria-pressed="false" style="flex: 1; font-family: Nunito, sans-serif; font-size: 13px; font-weight: 700; color: #4A4037; background: #FFFFFF; border: 1.5px solid #EFE4D2; border-radius: 12px; height: 40px">Small</button>
+<button type="button" aria-pressed="false" style="flex: 1; font-family: Nunito, sans-serif; font-size: 13px; font-weight: 700; color: #4A4037; background: #FFFFFF; border: 1.5px solid #EFE4D2; border-radius: 12px; height: 40px">Large</button>
+</div>
+</section>
+
+<button type="button" style="font-family: 'Baloo 2', sans-serif; font-size: 18px; font-weight: 800; color: #FFFFFF; background: #3F6B4B; border: 0; border-radius: 16px; height: 52px">Save feed</button>
+
+<section style="background: #FFFFFF; border: 1.5px dashed #B7CEDB; border-radius: 18px; padding: 10px 14px; display: flex; align-items: center; gap: 10px">
+<div style="flex: 1; display: flex; flex-direction: column">
+<span style="font-size: 14px; font-weight: 800">NG tube · left nostril</span>
+<span style="font-size: 12px; color: #5C5146">Day 4 of 7 · retaped this morning</span>
+</div>
+<button type="button" style="font-family: Nunito, sans-serif; font-size: 13px; font-weight: 800; color: #3B3127; background: #DCEBF2; border: 0; border-radius: 12px; padding: 0 12px; height: 44px">Log change</button>
+</section>
+</div>
+
+<nav aria-label="Main" style="height: 76px; flex-shrink: 0; background: #FFFFFF; border-top: 1.5px solid #EFE4D2; display: flex; justify-content: space-around; align-items: center; padding: 0 6px">
+<a href="Main.dc.html" style="text-decoration: none; color: #6E6255; padding: 6px 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 700">
+<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"></path></svg>Today</a>
+<a href="Feeds.dc.html" aria-current="page" style="text-decoration: none; color: #3F6B4B; background: #E3EFE4; border-radius: 16px; padding: 6px 12px; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 800">
+<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v3l-2 3v11a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V9l-2-3V3M8 13h8"></path></svg>Feeds</a>
+<a href="Meds.dc.html" style="text-decoration: none; color: #6E6255; padding: 6px 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 700">
+<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 3.5a5 5 0 0 1 7 7l-7 7a5 5 0 0 1-7-7z"></path><path d="M7 7l7 7"></path></svg>Meds</a>
+<a href="Growth.dc.html" style="text-decoration: none; color: #6E6255; padding: 6px 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 700">
+<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16h16"></path><path d="M7 15l4-4 3 3 5-6"></path></svg>Growth</a>
+<a href="Care.dc.html" style="text-decoration: none; color: #6E6255; padding: 6px 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 700">
+<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"></path></svg>Care</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
