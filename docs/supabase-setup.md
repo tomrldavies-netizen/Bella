@@ -86,7 +86,7 @@ receive sign-in emails, which the grandparents will need later.
 ## 7. Copy the two keys into GitHub
 
 1. In Supabase: **Project Settings** (cog, bottom left) → **API Keys**. Note:
-   - the **Project URL** (looks like `https://abcdefgh.supabase.co`). If it's not on this page, it's under **Project Settings → Data API**.
+   - the **Project URL**: just `https://abcdefgh.supabase.co`, with nothing after `.co`. (Under **Project Settings → Data API** it may be shown with `/rest/v1/` on the end; leave that part off.)
    - the **publishable** key (starts `sb_publishable_`), or, if your project shows the older keys, the **anon public** key.
    - **Never** use the `secret` or `service_role` key in the app.
 2. In GitHub: <https://github.com/tomrldavies-netizen/Bella/settings/secrets/actions> → **New repository secret**, twice:

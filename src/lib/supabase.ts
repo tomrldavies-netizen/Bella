@@ -1,7 +1,21 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
-const url = import.meta.env.VITE_SUPABASE_URL
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+/**
+ * Just the project address (https://abcd.supabase.co), even if the secret was
+ * pasted with a path such as /rest/v1/ or a trailing slash, or with spaces.
+ */
+export function projectUrl(raw: string | undefined): string | undefined {
+  const trimmed = raw?.trim()
+  if (!trimmed) return undefined
+  try {
+    return new URL(trimmed).origin
+  } catch {
+    return trimmed
+  }
+}
+
+const url = projectUrl(import.meta.env.VITE_SUPABASE_URL)
+const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim()
 
 /**
  * The Supabase client, or null when the URL and anon key aren't set
