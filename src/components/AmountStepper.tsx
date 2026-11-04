@@ -53,6 +53,7 @@ export function AmountStepper({ label, value, onChange, step, fineStep, min = 0,
   const handlers = (dir: 1 | -1) => ({
     onPointerDown: () => {
       timers.current.held = false
+      valueRef.current = value
       if (!fineStep) return
       timers.current.hold = window.setTimeout(() => {
         timers.current.held = true
@@ -69,6 +70,8 @@ export function AmountStepper({ label, value, onChange, step, fineStep, min = 0,
         timers.current.held = false
         return
       }
+      // A tap always starts from the value on screen.
+      valueRef.current = value
       bump(dir * step)
     },
   })

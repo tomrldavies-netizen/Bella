@@ -9,7 +9,7 @@ import { Segmented } from '../../components/Segmented'
 import { useReadyHousehold } from '../../household/HouseholdContext'
 import { useLiveQuery } from '../../lib/useLiveQuery'
 import { loadRoutines, saveRoutines, type Routines } from '../../plan/api'
-import { WEEKDAYS, describeRecurrence, formatInterval, summariseRoutineChange, type CareTaskDraft } from '../../plan/routines'
+import { WEEKDAYS, describeRecurrence, formatInterval, formatTempRange, summariseRoutineChange, type CareTaskDraft } from '../../plan/routines'
 
 const guide = <Meerkat size={56} />
 
@@ -89,6 +89,7 @@ function RoutinesEditor({ initial, householdId, readOnly, onSaved }: { initial: 
   const problems = [
     after.tasks.some((t) => !t.name) ? 'Give every care task a name.' : null,
     after.tasks.some((t) => t.recurrence.kind === 'weekly' && t.recurrence.days.length === 0) ? 'Pick at least one day for each weekly task.' : null,
+    after.tempMinC !== null && after.tempMaxC !== null && after.tempMinC >= after.tempMaxC ? 'The lowest normal temperature must be below the highest.' : null,
   ].filter((p): p is string => p !== null)
 
   async function save() {
@@ -140,6 +141,40 @@ function RoutinesEditor({ initial, householdId, readOnly, onSaved }: { initial: 
             <span className="text-xs text-ink-muted">Minutes a day</span>
           </span>
           <AmountStepper label="Tummy time goal" value={draft.tummyGoalMin} onChange={(tummyGoalMin) => set({ tummyGoalMin })} step={5} fineStep={1} max={240} unit="min" size="sm" readOnly={readOnly} />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="flex flex-col">
+              <span className="text-[13px] font-extrabold">Normal temperature range</span>
+              <span className="text-xs text-ink-muted">From Bella's team. Obs outside it are highlighted.</span>
+            </span>
+            {readOnly ? (
+              <span className="font-display text-lg font-extrabold">
+                {draft.tempMinC !== null && draft.tempMaxC !== null ? formatTempRange(draft.tempMinC, draft.tempMaxC) : 'Not set'}
+              </span>
+            ) : (
+              draft.tempMinC === null && (
+                <button type="button" onClick={() => set({ tempMinC: 37, tempMaxC: 37 })} className="h-10 rounded-full border-[1.5px] border-primary px-4 text-[13px] font-extrabold text-primary">
+                  Set
+                </button>
+              )
+            )}
+          </div>
+          {!readOnly && draft.tempMinC !== null && draft.tempMaxC !== null && (
+            <>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[13px] font-bold">From</span>
+                <AmountStepper label="Lowest normal temperature" value={draft.tempMinC} onChange={(tempMinC) => set({ tempMinC })} step={0.1} min={30} max={45} unit="°C" size="sm" />
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[13px] font-bold">To</span>
+                <AmountStepper label="Highest normal temperature" value={draft.tempMaxC} onChange={(tempMaxC) => set({ tempMaxC })} step={0.1} min={30} max={45} unit="°C" size="sm" />
+              </div>
+              <button type="button" onClick={() => set({ tempMinC: null, tempMaxC: null })} className="min-h-9 self-end text-xs font-extrabold text-ink-muted">
+                Clear
+              </button>
+            </>
+          )}
         </div>
         <OptionalSetting
           label="NG tube change"

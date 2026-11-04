@@ -34,16 +34,20 @@ describe('routines', () => {
       obsIntervalMin: 180,
       tummyGoalMin: 30,
       tubeChangeDays: null,
+      tempMinC: null,
+      tempMaxC: null,
       tasks: [{ id: 't1', name: 'Bath', recurrence: { kind: 'weekly', days: [1] } }, { id: 't2', name: 'Skin check', recurrence: { kind: 'every_n_days', every: 1 } }],
     }
     const after: RoutinesState = {
       obsIntervalMin: 240,
       tummyGoalMin: 40,
       tubeChangeDays: 7,
+      tempMinC: 36.5,
+      tempMaxC: 37.5,
       tasks: [{ id: 't1', name: 'Bath', recurrence: { kind: 'weekly', days: [1, 4] } }, { id: null, name: 'Nail trim', recurrence: { kind: 'every_n_days', every: 7 } }],
     }
     expect(summariseRoutineChange(before, after)).toBe(
-      'Obs every 4 hrs (was 3 hrs); Tummy time goal 30 → 40 min a day; Tube change every 7 days; Bath now every Mon and Thu; Added Nail trim (every 7 days); Removed Skin check',
+      'Obs every 4 hrs (was 3 hrs); Tummy time goal 30 → 40 min a day; Tube change every 7 days; Normal temperature range 36.5–37.5 °C; Bath now every Mon and Thu; Added Nail trim (every 7 days); Removed Skin check',
     )
     expect(summariseRoutineChange(before, before)).toBe('')
   })

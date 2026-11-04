@@ -42,3 +42,28 @@ export type TubeChange = {
 }
 
 export type NoteLog = { id: string; logged_by: string; logged_at: string; text: string }
+
+export type Breathing = 'normal' | 'noisy' | 'pauses' | 'colour_change'
+export type Sleep = 'settled' | 'unsettled' | 'very_sleepy'
+
+export type ObsLog = {
+  id: string
+  logged_by: string
+  logged_at: string
+  temperature_c: number | null
+  breathing: Breathing | null
+  sleep: Sleep | null
+  note: string | null
+}
+
+export type ExerciseLog = { id: string; logged_by: string; logged_at: string; exercise_id: string }
+export type TummyLog = { id: string; logged_by: string; logged_at: string; duration_min: number }
+export type WeightLog = {
+  id: string
+  logged_by: string
+  logged_at: string
+  measured_on: string
+  weight_g: number
+  length_cm: number | null
+  head_cm: number | null
+}

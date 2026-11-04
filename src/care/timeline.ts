@@ -1,5 +1,6 @@
 import { formatNumber, ukParts } from '../lib/ukTime'
-import type { Medicine } from '../plan/api'
+import type { Exercise, Medicine } from '../plan/api'
+import { describeObs, obsConcerns, type TempRange } from './obs'
 import type { DayLogs } from './api'
 import { describeFeed } from './feedLog'
 
@@ -9,6 +10,9 @@ export type TimelineEntry =
   | { kind: 'given'; row: DayLogs['given'][number] }
   | { kind: 'note'; row: DayLogs['notes'][number] }
   | { kind: 'tube'; row: DayLogs['tubeChanges'][number] }
+  | { kind: 'obs'; row: DayLogs['obs'][number] }
+  | { kind: 'exercise'; row: DayLogs['exercises'][number] }
+  | { kind: 'tummy'; row: DayLogs['tummy'][number] }
 
 export type TimelineItem = {
   key: string
@@ -23,13 +27,14 @@ export type TimelineItem = {
   flagged: boolean
 }
 
-export const DOT = { feed: '#7FA9C1', nappy: '#A994C4', given: '#E9A06B', note: '#D9B45A', tube: '#6FA89F' } as const
+export const DOT = { feed: '#7FA9C1', nappy: '#A994C4', given: '#E9A06B', note: '#D9B45A', tube: '#6FA89F', obs: '#8DB596', exercise: '#B5677D', speech: '#6FA89F', tummy: '#D98CA0' } as const
 
 export function nappyText(wet: boolean, dirty: boolean): string {
   return `Nappy · ${wet && dirty ? 'wet and dirty' : wet ? 'wet' : 'dirty'}`
 }
 
-export function buildTimeline(logs: DayLogs, medicines: Medicine[]): TimelineItem[] {
+export function buildTimeline(logs: DayLogs, medicines: Medicine[], exercises: Exercise[] = [], range: TempRange = null): TimelineItem[] {
+  const exercise = (id: string) => exercises.find((e) => e.id === id)
   const medName = (id: string) => medicines.find((m) => m.id === id)?.name ?? 'Medicine'
   const medUnit = (id: string) => medicines.find((m) => m.id === id)?.versions[0]?.unit ?? 'ml'
   const items: TimelineItem[] = [
@@ -53,6 +58,12 @@ export function buildTimeline(logs: DayLogs, medicines: Medicine[]): TimelineIte
       colour: DOT.tube,
       flagged: false,
     })),
+    ...logs.obs.map((row) => ({ entry: { kind: 'obs' as const, row }, text: describeObs(row, range), colour: DOT.obs, flagged: obsConcerns(row, range).length > 0 })),
+    ...logs.exercises.map((row) => {
+      const ex = exercise(row.exercise_id)
+      return { entry: { kind: 'exercise' as const, row }, text: `${ex?.name ?? 'Exercise'} done`, colour: ex?.type === 'speech_language' ? DOT.speech : DOT.exercise, flagged: false }
+    }),
+    ...logs.tummy.map((row) => ({ entry: { kind: 'tummy' as const, row }, text: `Tummy time ${row.duration_min} min`, colour: DOT.tummy, flagged: false })),
   ].map((i) => ({
     ...i,
     key: `${i.entry.kind}:${i.entry.row.id}`,

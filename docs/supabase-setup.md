@@ -135,5 +135,6 @@ Some phases add a new SQL file to `supabase/migrations/`. Run each one **once, i
 | 2 | `20261103000000_phase2_schema.sql` | Tables, roles and security rules |
 | 3 | [`20261104000000_phase3_plan.sql`](https://github.com/tomrldavies-netizen/Bella/blob/main/supabase/migrations/20261104000000_phase3_plan.sql) | Saving Bella's plan (feeds, medicines, exercises, routines) |
 | 4 | [`20261105000000_phase4_logging.sql`](https://github.com/tomrldavies-netizen/Bella/blob/main/supabase/migrations/20261105000000_phase4_logging.sql) | Double-dose check when marking a medicine given |
+| 5 | [`20261106000000_phase5_care.sql`](https://github.com/tomrldavies-netizen/Bella/blob/main/supabase/migrations/20261106000000_phase5_care.sql) | Normal temperature range in Obs & routines |
 
 If a file has already been run, running it again gives an error like "already exists". That's harmless, but nothing more is needed.

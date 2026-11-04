@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase'
-import type { FeedLog, GivenLog, NappyLog, NoteLog, TubeChange } from './types'
+import type { ExerciseLog, FeedLog, GivenLog, NappyLog, NoteLog, ObsLog, TubeChange, TummyLog, WeightLog } from './types'
 
 function db() {
   if (!supabase) throw new Error('Not connected')
@@ -11,7 +11,7 @@ function check<T>(res: { data: T | null; error: { message: string; details?: str
   return res.data as T
 }
 
-export type LogTable = 'feeds' | 'nappies' | 'medicine_given' | 'tube_changes' | 'notes'
+export type LogTable = 'feeds' | 'nappies' | 'medicine_given' | 'tube_changes' | 'notes' | 'obs' | 'exercise_logs' | 'tummy_time' | 'weights'
 
 export type DayLogs = {
   feeds: FeedLog[]
@@ -19,6 +19,9 @@ export type DayLogs = {
   given: GivenLog[]
   notes: NoteLog[]
   tubeChanges: TubeChange[]
+  obs: ObsLog[]
+  exercises: ExerciseLog[]
+  tummy: TummyLog[]
 }
 
 const num = <T extends object>(row: T, keys: (keyof T)[]): T => {
@@ -31,12 +34,15 @@ const num = <T extends object>(row: T, keys: (keyof T)[]): T => {
 export async function loadDayLogs(householdId: string, fromIso: string, toIso: string): Promise<DayLogs> {
   const q = (table: LogTable) =>
     db().from(table).select('*').eq('household_id', householdId).gte('logged_at', fromIso).lt('logged_at', toIso).order('logged_at', { ascending: false })
-  const [feeds, nappies, given, notes, tubeChanges] = await Promise.all([
+  const [feeds, nappies, given, notes, tubeChanges, obs, exercises, tummy] = await Promise.all([
     q('feeds'),
     q('nappies'),
     q('medicine_given'),
     q('notes'),
     q('tube_changes'),
+    q('obs'),
+    q('exercise_logs'),
+    q('tummy_time'),
   ])
   return {
     feeds: check<FeedLog[]>(feeds).map((f) => num(f, ['oral_ml', 'tube_ml'])),
@@ -44,7 +50,25 @@ export async function loadDayLogs(householdId: string, fromIso: string, toIso: s
     given: check<GivenLog[]>(given).map((g) => num(g, ['dose_given'])),
     notes: check<NoteLog[]>(notes),
     tubeChanges: check<TubeChange[]>(tubeChanges),
+    obs: check<ObsLog[]>(obs).map((o) => num(o, ['temperature_c'])),
+    exercises: check<ExerciseLog[]>(exercises),
+    tummy: check<TummyLog[]>(tummy),
   }
+}
+
+/** The most recent obs ever (for "obs due"). */
+export async function loadLatestObs(householdId: string): Promise<ObsLog | null> {
+  const row = check<ObsLog | null>(
+    await db().from('obs').select('*').eq('household_id', householdId).order('logged_at', { ascending: false }).limit(1).maybeSingle(),
+  )
+  return row ? num(row, ['temperature_c']) : null
+}
+
+/** Every weigh-in, oldest first. */
+export async function loadWeights(householdId: string): Promise<WeightLog[]> {
+  return check<WeightLog[]>(await db().from('weights').select('*').eq('household_id', householdId).order('measured_on')).map((w) =>
+    num(w, ['weight_g', 'length_cm', 'head_cm']),
+  )
 }
 
 /** The tube currently in (latest change). */

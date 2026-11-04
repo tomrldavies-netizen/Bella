@@ -18,6 +18,8 @@ vi.mock('../care/api', async (orig) => {
     AlreadyGiven: real.AlreadyGiven,
     loadDayLogs: vi.fn(),
     loadLatestTube: vi.fn(),
+    loadLatestObs: vi.fn(async () => null),
+    loadWeights: vi.fn(async () => []),
     loadGivenBetween: vi.fn(),
     addLog: vi.fn(async () => 'new-id'),
     updateLog: vi.fn(async () => {}),
@@ -48,13 +50,16 @@ beforeEach(() => {
   vi.clearAllMocks()
   plan.loadFeedPlans.mockResolvedValue([{ id: 'p', effective_from: '2026-11-01T00:00:00Z', note: null, created_by: 'm-dad', slots }])
   plan.loadMedicines.mockResolvedValue([iron])
-  plan.loadRoutines.mockResolvedValue({ obsIntervalMin: null, tummyGoalMin: 30, tubeChangeDays: 7, tasks: [] })
+  plan.loadRoutines.mockResolvedValue({ obsIntervalMin: null, tummyGoalMin: 30, tubeChangeDays: 7, tempMinC: null, tempMaxC: null, tasks: [] })
   care.loadDayLogs.mockResolvedValue({
     feeds: [{ id: 'f1', logged_by: 'm-dad', logged_at: '2026-12-04T18:05:00Z', feed_plan_slot_id: 's6', started_at: null, ended_at: null, method: 'bottle_tube', oral_ml: 15, tube_ml: 35, milk_type: 'breast', fortified: false, sick_level: 'none', note: null }],
     nappies: [{ id: 'n1', logged_by: 'm-dad', logged_at: '2026-12-04T19:40:00Z', wet: true, dirty: false, note: null }],
     given: [ironGiven11],
     notes: [],
     tubeChanges: [],
+    obs: [],
+    exercises: [],
+    tummy: [],
   })
   care.loadGivenBetween.mockResolvedValue([ironGiven11])
   care.loadLatestTube.mockResolvedValue({ id: 't1', logged_by: 'm-dad', logged_at: '', nostril: 'left', inserted_at: '2026-11-28T09:00:00Z', retaped_at: null, note: null })

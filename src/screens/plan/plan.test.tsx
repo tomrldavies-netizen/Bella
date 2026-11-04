@@ -35,7 +35,7 @@ const iron: api.Medicine = {
     { id: 'v2', dose: 1.2, unit: 'ml', route: 'mouth', times: ['05:00', '17:00'], effective_from: '2026-10-19T21:00:00Z', effective_to: null, reason: 'after weigh-in' },
   ],
 }
-const routines: api.Routines = { obsIntervalMin: 240, tummyGoalMin: 30, tubeChangeDays: 7, tasks: [] }
+const routines: api.Routines = { obsIntervalMin: 240, tummyGoalMin: 30, tubeChangeDays: 7, tempMinC: null, tempMaxC: null, tasks: [] }
 
 beforeEach(() => {
   vi.clearAllMocks()

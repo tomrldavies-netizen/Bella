@@ -14,6 +14,9 @@ import { draftFromPlanned, feedRow, type FeedDraft } from '../feedDraft'
 import type { FeedPlanVersion } from '../../plan/api'
 import { plannedFeedsAround } from '../feedLog'
 import type { TimelineEntry } from '../timeline'
+import { ObsForm } from '../ObsForm'
+import { obsRow, type ObsDraft } from '../obsDraft'
+import type { TempRange } from '../obs'
 
 const label = 'text-[13px] font-extrabold'
 const saveBtn = 'h-12 w-full rounded-full bg-primary text-base font-extrabold text-white disabled:opacity-50'
@@ -75,6 +78,9 @@ const TABLE: Record<TimelineEntry['kind'], LogTable> = {
   given: 'medicine_given',
   note: 'notes',
   tube: 'tube_changes',
+  obs: 'obs',
+  exercise: 'exercise_logs',
+  tummy: 'tummy_time',
 }
 const TITLE: Record<TimelineEntry['kind'], string> = {
   feed: 'Edit feed',
@@ -82,6 +88,9 @@ const TITLE: Record<TimelineEntry['kind'], string> = {
   given: 'Edit dose given',
   note: 'Edit note',
   tube: 'Edit tube change',
+  obs: 'Edit obs',
+  exercise: 'Edit exercise',
+  tummy: 'Edit tummy time',
 }
 
 /** Tap a timeline entry to edit or delete it (SPEC §4.1). */
@@ -90,6 +99,7 @@ export function EditEntrySheet({
   plans,
   medicineName,
   unit,
+  range = null,
   onDone,
   onClose,
 }: {
@@ -98,6 +108,8 @@ export function EditEntrySheet({
   plans: FeedPlanVersion[]
   medicineName?: string
   unit?: string
+  /** Normal temperature range, for highlighting obs. */
+  range?: TempRange
   onDone: () => void
   onClose: () => void
 }) {
@@ -113,6 +125,12 @@ export function EditEntrySheet({
   const [nappy, setNappy] = useState(entry.kind === 'nappy' ? { wet: entry.row.wet, dirty: entry.row.dirty } : { wet: true, dirty: false })
   const [text, setText] = useState(entry.kind === 'note' ? entry.row.text : '')
   const [dose, setDose] = useState(entry.kind === 'given' ? (entry.row.dose_given ?? 0) : 0)
+  const [obs, setObs] = useState<ObsDraft>(() =>
+    entry.kind === 'obs'
+      ? { temp: entry.row.temperature_c ?? 37, breathing: entry.row.breathing ?? 'normal', sleep: entry.row.sleep ?? 'settled', note: entry.row.note ?? '' }
+      : { temp: 37, breathing: 'normal', sleep: 'settled', note: '' },
+  )
+  const [minutes, setMinutes] = useState(entry.kind === 'tummy' ? entry.row.duration_min : 0)
   const [nostril, setNostril] = useState<'left' | 'right'>(entry.kind === 'tube' ? entry.row.nostril : 'left')
   const [feed, setFeed] = useState<FeedDraft>(() => {
     if (entry.kind !== 'feed') return draftFromPlanned(null, when.time)
@@ -134,6 +152,7 @@ export function EditEntrySheet({
   const future = Date.parse(loggedAt) > currentTime().getTime() + 5 * 60_000
 
   function patch(): object {
+    // Every kind is handled below.
     switch (entry.kind) {
       case 'feed':
         return feedRow(feed, loggedAt)
@@ -145,6 +164,12 @@ export function EditEntrySheet({
         return { logged_at: loggedAt, given_at: loggedAt, dose_given: dose }
       case 'tube':
         return { logged_at: loggedAt, inserted_at: loggedAt, nostril }
+      case 'obs':
+        return { logged_at: loggedAt, ...obsRow(obs) }
+      case 'exercise':
+        return { logged_at: loggedAt }
+      case 'tummy':
+        return { logged_at: loggedAt, duration_min: minutes }
     }
   }
 
@@ -160,7 +185,8 @@ export function EditEntrySheet({
     }
   }
 
-  const invalid = (entry.kind === 'nappy' && !nappy.wet && !nappy.dirty) || (entry.kind === 'note' && !text.trim()) || future
+  const invalid =
+    (entry.kind === 'nappy' && !nappy.wet && !nappy.dirty) || (entry.kind === 'note' && !text.trim()) || (entry.kind === 'tummy' && minutes <= 0) || future
 
   return (
     <BottomSheet title={TITLE[entry.kind]} onClose={onClose}>
@@ -178,6 +204,13 @@ export function EditEntrySheet({
         <div className="flex items-center justify-between gap-2">
           <span className={label}>{medicineName} given</span>
           <AmountStepper label="Dose given" value={dose} onChange={setDose} step={DOSE_STEP} fineStep={DOSE_FINE_STEP} max={100} unit={unit ?? 'ml'} />
+        </div>
+      )}
+      {entry.kind === 'obs' && <ObsForm draft={obs} onChange={setObs} range={range} />}
+      {entry.kind === 'tummy' && (
+        <div className="flex items-center justify-between gap-2">
+          <span className={label}>Tummy time</span>
+          <AmountStepper label="Minutes" value={minutes} onChange={setMinutes} step={1} min={0} max={240} unit="min" />
         </div>
       )}
       {entry.kind === 'tube' && (

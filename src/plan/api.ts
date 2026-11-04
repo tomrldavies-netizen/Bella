@@ -201,6 +201,8 @@ export type Routines = {
   obsIntervalMin: number | null
   tummyGoalMin: number
   tubeChangeDays: number | null
+  tempMinC: number | null
+  tempMaxC: number | null
   tasks: CareTaskDraft[]
 }
 
@@ -208,7 +210,7 @@ type TaskRow = { id: string; name: string; recurrence: string; every_days: numbe
 
 export async function loadRoutines(householdId: string): Promise<Routines> {
   const [settings, tasks] = await Promise.all([
-    db().from('settings').select('obs_interval_min, tummy_goal_min, tube_change_days').eq('household_id', householdId).single(),
+    db().from('settings').select('obs_interval_min, tummy_goal_min, tube_change_days, temp_min_c, temp_max_c').eq('household_id', householdId).single(),
     db()
       .from('care_tasks')
       .select('id, name, recurrence, every_days, weekdays')
@@ -216,12 +218,20 @@ export async function loadRoutines(householdId: string): Promise<Routines> {
       .eq('active', true)
       .order('sort_order'),
   ])
-  const s = check<{ obs_interval_min: number | null; tummy_goal_min: number; tube_change_days: number | null }>(settings)
+  const s = check<{
+    obs_interval_min: number | null
+    tummy_goal_min: number
+    tube_change_days: number | null
+    temp_min_c: number | null
+    temp_max_c: number | null
+  }>(settings)
   const t = check<TaskRow[]>(tasks)
   return {
     obsIntervalMin: s.obs_interval_min,
     tummyGoalMin: s.tummy_goal_min,
     tubeChangeDays: s.tube_change_days,
+    tempMinC: s.temp_min_c === null ? null : Number(s.temp_min_c),
+    tempMaxC: s.temp_max_c === null ? null : Number(s.temp_max_c),
     tasks: t.map((r) => ({
       id: r.id,
       name: r.name,
@@ -240,6 +250,8 @@ export async function saveRoutines(args: { householdId: string; after: Routines;
       p_obs_interval_min: a.obsIntervalMin,
       p_tummy_goal_min: a.tummyGoalMin,
       p_tube_change_days: a.tubeChangeDays,
+      p_temp_min_c: a.tempMinC,
+      p_temp_max_c: a.tempMaxC,
       p_tasks: a.tasks.map((t) => ({
         id: t.id,
         name: t.name,

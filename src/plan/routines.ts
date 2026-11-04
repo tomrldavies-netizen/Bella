@@ -6,8 +6,14 @@ export type RoutinesState = {
   obsIntervalMin: number | null
   tummyGoalMin: number
   tubeChangeDays: number | null
+  /** Normal temperature range from Bella's team; both null when not set. */
+  tempMinC: number | null
+  tempMaxC: number | null
   tasks: CareTaskDraft[]
 }
+
+/** "36.5–37.5 °C" */
+export const formatTempRange = (min: number, max: number) => `${min.toFixed(1)}–${max.toFixed(1)} °C`
 
 export const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
 
@@ -55,6 +61,10 @@ export function summariseRoutineChange(before: RoutinesState, after: RoutinesSta
   }
   if (before.tubeChangeDays !== after.tubeChangeDays) {
     parts.push(after.tubeChangeDays ? `Tube change every ${after.tubeChangeDays} days` : 'Tube change interval removed')
+  }
+  const range = (r: RoutinesState) => (r.tempMinC !== null && r.tempMaxC !== null ? formatTempRange(r.tempMinC, r.tempMaxC) : null)
+  if (range(before) !== range(after)) {
+    parts.push(range(after) ? `Normal temperature range ${range(after)}` : 'Normal temperature range removed')
   }
   const old = new Map(before.tasks.filter((t) => t.id).map((t) => [t.id, t]))
   const kept = new Set<string>()

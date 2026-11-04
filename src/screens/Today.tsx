@@ -8,6 +8,7 @@ import { doseStatus, dosesForDay, nextDose } from '../care/medSchedule'
 import { EditEntrySheet, NappySheet, NoteSheet } from '../care/sheets/LogSheets'
 import { buildTimeline, type TimelineItem } from '../care/timeline'
 import { tubeStatus } from '../care/tube'
+import { obsDueAt, tempRangeOf } from '../care/obs'
 import { useToday } from '../care/useToday'
 import { Toast } from '../components/BottomSheet'
 import { Card, EmptyNote } from '../components/Card'
@@ -17,7 +18,7 @@ import { NamePill } from '../components/NamePill'
 import { useReadyHousehold } from '../household/HouseholdContext'
 import { actualAgeLabel, correctedAgeLabel, dueDateLabel, ukToday } from '../lib/age'
 import { formatLongDate, greeting } from '../lib/dates'
-import { formatNumber } from '../lib/ukTime'
+import { formatNumber, ukParts } from '../lib/ukTime'
 import { formatDose } from '../plan/medicines'
 
 const pillClass = 'rounded-full bg-card px-2.5 py-[5px] text-xs font-bold text-ink no-underline hover:text-ink'
@@ -138,12 +139,12 @@ function UpNext({ cards, loading }: { cards: UpNextCard[]; loading: boolean }) {
           </EmptyNote>
         </Card>
       ) : (
-        <div className="flex gap-2.5 md:grid md:grid-cols-3 md:gap-3">
+        <div className="-mx-4 flex snap-x gap-2.5 overflow-x-auto px-4 pb-1 md:mx-0 md:grid md:grid-cols-3 md:gap-3 md:overflow-visible md:px-0">
           {cards.map((c) => (
             <Link
               key={c.key}
               to={c.to}
-              className={`${c.tint} flex min-w-0 flex-1 flex-col gap-1 rounded-[18px] p-3 text-ink no-underline hover:text-ink md:rounded-[20px] md:p-4`}
+              className={`${c.tint} flex min-w-[112px] flex-1 snap-start flex-col gap-1 rounded-[18px] p-3 text-ink no-underline hover:text-ink md:rounded-[20px] md:p-4`}
             >
               <span className="md:hidden">{c.icon}</span>
               <span className="truncate text-[13px] font-bold md:text-sm md:font-extrabold">{c.label}</span>
@@ -177,14 +178,14 @@ function QuickLog({ onNappy, onNote }: { onNappy: () => void; onNote: () => void
           <LionCub size={28} bg="#FBE3D3" />
           Meds
         </Link>
-        <button type="button" className={`${tileClass} opacity-60`} disabled title="Coming soon">
+        <Link to="/care" className={tileClass}>
           <Meerkat size={28} bg="#E3EFE4" />
           Obs
-        </button>
-        <button type="button" className={`${tileClass} opacity-60`} disabled title="Coming soon">
+        </Link>
+        <Link to="/care" className={tileClass}>
           <Monkey size={28} bg="#F8E1E4" />
           Tummy time
-        </button>
+        </Link>
         <button type="button" className={tileClass} onClick={onNote}>
           <PencilIcon size={28} strokeWidth={1.8} />
           Note
@@ -273,6 +274,20 @@ export function Today() {
       alert: overdue,
     })
   }
+  const range = tempRangeOf(t.routines)
+  const obsDue = obsDueAt(t.lastObs, t.routines?.obsIntervalMin ?? null, t.now)
+  if (obsDue && t.ready) {
+    cards.push({
+      key: 'obs',
+      to: '/care',
+      tint: 'bg-obs',
+      icon: <Meerkat size={30} />,
+      label: 'Obs',
+      big: t.lastObs ? countdown(obsDue, t.now) : 'Due',
+      detail: t.lastObs ? `${ukParts(obsDue).time} · temp, breathing, sleep` : 'none logged yet',
+      alert: Date.parse(obsDue) < t.now.getTime(),
+    })
+  }
   const tube = tubeStatus(t.tube, t.routines?.tubeChangeDays ?? null, t.today)
   if (tube?.intervalDays && tube.day >= tube.intervalDays) {
     cards.push({
@@ -287,7 +302,9 @@ export function Today() {
     })
   }
 
-  const items = logs ? buildTimeline(logs, meds) : []
+  const items = logs ? buildTimeline(logs, meds, t.exercises ?? [], range) : []
+  const tummyMin = (logs?.tummy ?? []).reduce((sum, x) => sum + x.duration_min, 0)
+  const tummyGoal = t.routines?.tummyGoalMin ?? 0
   const milk = feedTotals(logs?.feeds ?? [])
   const target = plannedDayTotal(plans, t.today)
   const scheduled = dosesForDay(meds, t.today)
@@ -333,6 +350,7 @@ export function Today() {
             <h2 className="m-0 text-xl font-bold">So far today</h2>
             <Bar label="Milk" value={target ? `${formatNumber(milk.total)} / ${formatNumber(target)} ml` : `${formatNumber(milk.total)} ml`} of={target ? milk.total / target : 0} colour="#7FA9C1" />
             <Bar label="Medicines" value={`${givenCount} / ${scheduled.length}`} of={scheduled.length ? givenCount / scheduled.length : 0} colour="#E9A06B" />
+            <Bar label="Tummy time" value={tummyGoal ? `${tummyMin} / ${tummyGoal} min` : `${tummyMin} min`} of={tummyGoal ? tummyMin / tummyGoal : 0} colour="#B5677D" />
             <div className="flex justify-between text-sm font-bold">
               <span>Nappies</span>
               <span>
@@ -369,6 +387,7 @@ export function Today() {
           plans={plans}
           medicineName={openMed?.name}
           unit={openMed?.versions[0]?.unit}
+          range={range}
           onClose={closeSheet}
           onDone={() => {
             setSheet(null)

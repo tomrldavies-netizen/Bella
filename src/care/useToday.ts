@@ -2,10 +2,10 @@ import { useReadyHousehold } from '../household/HouseholdContext'
 import { useLiveQuery } from '../lib/useLiveQuery'
 import { useNow } from '../lib/useNow'
 import { addDaysIso, ukNow, ukToIso } from '../lib/ukTime'
-import { loadFeedPlans, loadMedicines, loadRoutines } from '../plan/api'
-import { loadDayLogs, loadGivenBetween, loadLatestTube } from './api'
+import { loadExercises, loadFeedPlans, loadMedicines, loadRoutines } from '../plan/api'
+import { loadDayLogs, loadGivenBetween, loadLatestObs, loadLatestTube } from './api'
 
-const LOG_TABLES = ['feeds', 'nappies', 'medicine_given', 'notes', 'tube_changes'] as const
+const LOG_TABLES = ['feeds', 'nappies', 'medicine_given', 'notes', 'tube_changes', 'obs', 'exercise_logs', 'tummy_time'] as const
 
 /**
  * Everything the care screens need for today (UK midnight to midnight),
@@ -25,10 +25,12 @@ export function useToday() {
   const routines = useLiveQuery(hid, ['settings', 'care_tasks'], loadRoutines)
   // Doses matched on their scheduled time (today and tomorrow), whenever they were logged.
   const scheduledGiven = useLiveQuery(hid, ['medicine_given'], (h) => loadGivenBetween(h, from, ukToIso(addDaysIso(today, 2), '00:00')), today)
+  const exercises = useLiveQuery(hid, ['exercises', 'exercise_steps'], loadExercises)
+  const lastObs = useLiveQuery(hid, ['obs'], (h) => loadLatestObs(h).then((latest) => ({ latest })))
   const tube = useLiveQuery(hid, ['tube_changes'], (h) => loadLatestTube(h).then((latest) => ({ latest })))
 
-  const error = logs.error ?? scheduledGiven.error ?? plans.error ?? medicines.error ?? routines.error ?? tube.error
-  const ready = !!(logs.data && scheduledGiven.data && plans.data && medicines.data && routines.data && tube.data)
+  const error = logs.error ?? scheduledGiven.error ?? plans.error ?? medicines.error ?? routines.error ?? tube.error ?? exercises.error ?? lastObs.error
+  const ready = !!(logs.data && scheduledGiven.data && plans.data && medicines.data && routines.data && tube.data && exercises.data && lastObs.data)
   return {
     householdId: hid,
     me,
@@ -44,10 +46,13 @@ export function useToday() {
     medicines: medicines.data,
     routines: routines.data,
     tube: tube.data?.latest ?? null,
+    exercises: exercises.data,
+    lastObs: lastObs.data?.latest ?? null,
     reload: () => {
       logs.reload()
       scheduledGiven.reload()
       tube.reload()
+      lastObs.reload()
     },
   }
 }

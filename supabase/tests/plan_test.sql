@@ -79,17 +79,17 @@ select tests.check_count(format($$select * from public.exercises where id = %L a
   'how often and the timing note are saved');
 
 -- ---------------------------------------------------------------- routines
-select public.save_routines(:'hid', 240, 30, 7,
+select public.save_routines(:'hid', 240, 30, 7, null, null,
   '[{"name":"Bath","recurrence":"weekly","weekdays":[4,1]},{"name":"Skin check","recurrence":"every_n_days","every_days":2}]',
   'Obs every 4 hrs', null, null, true);
 select tests.check_count('select * from public.settings where obs_interval_min = 240 and tube_change_days = 7', 1, 'settings saved');
 select tests.check_count($$select * from public.care_tasks where name = 'Bath' and weekdays = '{1,4}' and active$$, 1, 'weekly task saved');
 select id as bath from public.care_tasks where name = 'Bath' \gset
-select public.save_routines(:'hid', 240, 30, 7, format('[{"id":"%s","name":"Bath time","recurrence":"weekly","weekdays":[1]}]', :'bath')::jsonb,
+select public.save_routines(:'hid', 240, 30, 7, null, null, format('[{"id":"%s","name":"Bath time","recurrence":"weekly","weekdays":[1]}]', :'bath')::jsonb,
   'Removed skin check', null, null, true);
 select tests.check_count($$select * from public.care_tasks where name = 'Skin check' and not active$$, 1, 'a removed task is retired, not deleted');
 select tests.check_count($$select * from public.care_tasks where name = 'Bath time' and weekdays = '{1}'$$, 1, 'a task can be edited');
-select tests.must_fail(format($$select public.save_routines(%L, 240, 30, 7, '[{"name":"X","recurrence":"weekly","weekdays":[]}]', 'x', null, null, true)$$, :'hid'),
+select tests.must_fail(format($$select public.save_routines(%L, 240, 30, 7, null, null, '[{"name":"X","recurrence":"weekly","weekdays":[]}]', 'x', null, null, true)$$, :'hid'),
   'a weekly task needs at least one day');
 
 -- ---------------------------------------------------------------- helper is refused
@@ -105,8 +105,17 @@ select tests.must_fail(format($$select public.save_medicine(%L, %L, 'Renamed', n
   'helper cannot rename a medicine');
 select tests.must_fail(format($$select public.save_exercise(%L, %L, 'physio', 'X', 1, null, true, '[]', 'x', null, null, true)$$, :'hid', :'ex'),
   'helper cannot change an exercise');
-select tests.must_fail(format($$select public.save_routines(%L, 60, 5, 1, '[]', 'x', null, null, true)$$, :'hid'),
+select tests.must_fail(format($$select public.save_routines(%L, 60, 5, 1, null, null, '[]', 'x', null, null, true)$$, :'hid'),
   'helper cannot change routines');
 select tests.check_count('select * from public.medicine_doses where dose = 9', 0, 'nothing a helper tried was saved');
 select tests.check_count($$select * from public.plan_changes where summary = 'x'$$, 0, 'and no changes were recorded for them');
 select tests.check_count('select * from public.settings where obs_interval_min = 240', 1, 'routines are unchanged');
+
+-- ---------------------------------------------------------------- temperature range (phase 5)
+select tests.act_as('00000000-0000-0000-0000-00000000000a');
+select public.save_routines(:'hid', 240, 30, 7, 36.5, 37.5, '[]', 'Normal temperature range', null, null, true);
+select tests.check_count('select * from public.settings where temp_min_c = 36.5 and temp_max_c = 37.5', 1, 'parent can set the normal temperature range');
+select tests.must_fail(format($$select public.save_routines(%L, 240, 30, 7, 37.5, 36.5, '[]', 'x', null, null, true)$$, :'hid'),
+  'the range must run low to high');
+select tests.must_fail(format($$select public.save_routines(%L, 240, 30, 7, 36.5, null, '[]', 'x', null, null, true)$$, :'hid'),
+  'both ends of the range are needed');

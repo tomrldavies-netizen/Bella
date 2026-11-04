@@ -53,3 +53,13 @@ select tests.must_succeed(format($$select public.give_medicine(%L, %L, '2026-11-
 select tests.must_succeed(format($$select public.give_medicine(%L, %L, null, now(), 1.2, false)$$, :'hid', :'med'),
   'an unscheduled dose is not blocked');
 select tests.check_count(format($$select * from public.medicine_given where medicine_id = %L$$, :'med'), 4, 'all intended doses recorded');
+
+-- ---------------------------------------------------------------- care logs (phase 5)
+select tests.act_as('00000000-0000-0000-0000-00000000000b');
+select tests.must_succeed(format($$insert into public.obs (household_id, temperature_c, breathing, sleep) values (%L, 36.8, 'normal', 'settled')$$, :'hid'),
+  'helper can log obs');
+select tests.must_succeed(format($$insert into public.tummy_time (household_id, duration_min) values (%L, 6)$$, :'hid'), 'helper can log tummy time');
+select tests.must_succeed(format($$insert into public.weights (household_id, measured_on, weight_g) values (%L, '2026-11-05', 2310)$$, :'hid'),
+  'helper can log a weigh-in');
+select tests.must_fail(format($$insert into public.obs (household_id, temperature_c) values (%L, 50)$$, :'hid'), 'an impossible temperature is refused');
+select tests.check_changed('update public.settings set temp_min_c = 30, temp_max_c = 40', 0, 'helper cannot change the temperature range');
