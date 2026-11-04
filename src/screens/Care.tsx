@@ -73,7 +73,7 @@ function ExerciseGroup({
             {e.steps.length > 0 && (
               <details>
                 <summary className="min-h-9 cursor-pointer content-center text-xs font-extrabold text-primary">How to do it</summary>
-                <ol className="m-0 flex flex-col gap-1 pb-1 pl-5 text-sm">
+                <ol className="m-0 flex list-decimal flex-col gap-1 pb-1 pl-5 text-sm">
                   {e.steps.map((s, i) => (
                     <li key={i}>{s}</li>
                   ))}

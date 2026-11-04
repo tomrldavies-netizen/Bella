@@ -1,11 +1,40 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useAuth } from '../auth/AuthContext'
 import { Card } from '../components/Card'
 import { ErrorNote, Field, inputClass, primaryButtonClass } from '../components/Field'
+import { invitePreview, type InvitePreview } from '../family/api'
 import { WelcomeLayout } from './WelcomeLayout'
 
-export function SignIn() {
+/** Shows who an invite is for, before signing in. */
+export function InviteBanner({ preview }: { preview: InvitePreview }) {
+  if (preview.status !== 'ok') {
+    return (
+      <p role="alert" className="m-0 rounded-2xl bg-meds px-4 py-3 text-sm font-bold text-alert">
+        This invite {preview.status === 'used' ? 'has already been used' : 'has expired'}. Ask a parent to send a new one.
+      </p>
+    )
+  }
+  return (
+    <div className="flex flex-col gap-1 rounded-2xl border-[1.5px] border-banner-accent bg-banner px-4 py-3">
+      <span className="font-display text-lg font-extrabold">
+        {preview.display_name}, you've been invited{preview.baby_name ? ` to help with ${preview.baby_name}` : ''}
+      </span>
+      <span className="text-sm">
+        As a {preview.role === 'parent' ? 'parent' : 'helper'}.{' '}
+        {preview.email_hint ? `Sign in with the email the invite was sent to: ${preview.email_hint}` : ''}
+      </span>
+    </div>
+  )
+}
+
+export function SignIn({ inviteToken = null }: { inviteToken?: string | null }) {
   const { sendCode, verifyCode } = useAuth()
+  const [preview, setPreview] = useState<InvitePreview | null>(null)
+  useEffect(() => {
+    if (!inviteToken) return
+    invitePreview(inviteToken).then(setPreview, () => setPreview(null))
+  }, [inviteToken])
+  const newAccount = preview?.status === 'ok'
   const [email, setEmail] = useState('')
   const [code, setCode] = useState('')
   const [step, setStep] = useState<'email' | 'code'>('email')
@@ -17,7 +46,7 @@ export function SignIn() {
     e.preventDefault()
     setBusy(true)
     setError(null)
-    const err = await sendCode(email.trim())
+    const err = await sendCode(email.trim(), { newAccount })
     setBusy(false)
     if (err) setError(err)
     else setStep('code')
@@ -35,7 +64,7 @@ export function SignIn() {
   async function resend() {
     setBusy(true)
     setError(null)
-    const err = await sendCode(email.trim())
+    const err = await sendCode(email.trim(), { newAccount })
     setBusy(false)
     if (err) setError(err)
     else setResent(true)
@@ -43,6 +72,7 @@ export function SignIn() {
 
   return (
     <WelcomeLayout title="Bella's Safari" subtitle="Sign in to see Bella's day">
+      {preview && <InviteBanner preview={preview} />}
       {step === 'email' ? (
         <Card className="px-4 py-4">
           <form onSubmit={submitEmail} className="flex flex-col gap-4">

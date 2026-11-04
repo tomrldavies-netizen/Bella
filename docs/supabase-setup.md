@@ -23,6 +23,8 @@ Do these steps once, in order. It takes about 15 minutes. Anything in `CAPITALS`
 
 ## 3. Close sign-ups, so only people you add can sign in
 
+> **From phase 6 this changes:** sign-ups go back **on** so invited family can create an account. See "Phase 6: invites" below.
+
 1. **Authentication** → **Sign In / Providers**.
 2. Under **User Signups**, turn **off** “Allow new users to sign up”. Click **Save**.
 3. Check **Email** is enabled in the provider list below (it is by default).
@@ -104,22 +106,18 @@ receive sign-in emails, which the grandparents will need later.
 2. Enter your email → **Email me a code** → type the code from the email.
 3. Fill in your name and colour, and Bella's date of birth and gestation at birth → **Start Bella's safari**.
 
-## Later: adding your wife as a second parent
+## Phase 6: invites
 
-Until invites arrive in phase 6:
+Do these once, after running the phase 6 SQL file (table below).
 
-1. Add her as a user as in step 6.
-2. In **SQL Editor** → **New query**, paste this, put her email in, and click **Run**:
+1. **Turn sign-ups back on.** Authentication → Sign In / Providers → **User Signups** → turn **on** "Allow new users to sign up" → **Save**.
+   This is safe: a new account sees nothing at all unless it joins with a valid invite sent to that exact email,
+   and no one can start a second household.
+2. **Make sure step 4 (Gmail SMTP) is done.** Without it, Supabase only emails people on your Supabase team, so grandparents wouldn't get their codes.
+3. In the app: **Bella's plan → Family & sharing → Invite someone**. Enter their name and email, choose Helper or Parent,
+   then **Share invite** and send it by WhatsApp or text. Their link works for 7 days, once, and only for that email.
 
-   ```sql
-   insert into public.members (household_id, user_id, display_name, colour, role)
-   select (select id from public.households order by created_at limit 1), id, 'Mum', '#FBE3D3', 'parent'
-   from auth.users
-   where email = 'HER EMAIL';
-   ```
-
-   It should say **Success. 1 row** (or similar). If it says 0 rows, the email doesn't match the user you created.
-3. She can now sign in with a code on her own phone.
+This replaces the old SQL snippet for adding your wife: invite her as a **Parent** instead.
 
 ## Running the app on a computer (optional)
 
@@ -136,5 +134,6 @@ Some phases add a new SQL file to `supabase/migrations/`. Run each one **once, i
 | 3 | [`20261104000000_phase3_plan.sql`](https://github.com/tomrldavies-netizen/Bella/blob/main/supabase/migrations/20261104000000_phase3_plan.sql) | Saving Bella's plan (feeds, medicines, exercises, routines) |
 | 4 | [`20261105000000_phase4_logging.sql`](https://github.com/tomrldavies-netizen/Bella/blob/main/supabase/migrations/20261105000000_phase4_logging.sql) | Double-dose check when marking a medicine given |
 | 5 | [`20261106000000_phase5_care.sql`](https://github.com/tomrldavies-netizen/Bella/blob/main/supabase/migrations/20261106000000_phase5_care.sql) | Normal temperature range in Obs & routines |
+| 6 | [`20261107000000_phase6_family.sql`](https://github.com/tomrldavies-netizen/Bella/blob/main/supabase/migrations/20261107000000_phase6_family.sql) | Invites, joining, own name and colour, one household only |
 
 If a file has already been run, running it again gives an error like "already exists". That's harmless, but nothing more is needed.

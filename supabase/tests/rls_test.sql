@@ -114,7 +114,14 @@ select tests.must_fail(format($$insert into public.nappies (household_id, wet) v
   'outsider cannot log into the household');
 select tests.check_changed('update public.feed_plan_slots set volume_ml = 1', 0, 'outsider cannot change the plan');
 -- Outsider starts their own household, then tries to point at Bella's plan.
-select public.create_household('Other', '#FBE3D3', 'Other baby', '2026-09-01', 30, 0, '2026-11-10') as other_hid \gset
+select tests.must_fail($$select public.create_household('Other', '#FBE3D3', 'Other baby', '2026-09-01', 30, 0, '2026-11-10')$$,
+  'no one can start a second household');
+-- A second household made directly (as the database owner) to test isolation.
+reset role;
+insert into public.households (name) values ('Other family') returning id as other_hid \gset
+insert into public.members (household_id, user_id, display_name, role) values (:'other_hid', '00000000-0000-0000-0000-00000000000c', 'Other', 'parent');
+insert into public.babies (household_id, name, birth_date, gestation_weeks, due_date) values (:'other_hid', 'Other baby', '2026-09-01', 30, '2026-11-10');
+select tests.act_as('00000000-0000-0000-0000-00000000000c');
 select tests.check_count('select * from public.babies', 1, 'outsider only sees their own baby');
 select tests.must_fail(format($$insert into public.feeds (household_id, feed_plan_slot_id, tube_ml) values (%L, %L, 10)$$, :'other_hid', :'slot_id'),
   'cannot link a feed to another household''s plan');

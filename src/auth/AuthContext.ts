@@ -6,8 +6,12 @@ export type AuthApi = {
   configured: boolean
   loading: boolean
   session: Session | null
-  /** Emails a sign-in code (and link). Resolves to an error message, or null. */
-  sendCode: (email: string) => Promise<string | null>
+  /**
+   * Emails a sign-in code (and link). Resolves to an error message, or null.
+   * `newAccount` lets someone with an invite create their account; everyone
+   * else must already have one.
+   */
+  sendCode: (email: string, opts?: { newAccount?: boolean }) => Promise<string | null>
   /** Checks the emailed code. Resolves to an error message, or null. */
   verifyCode: (email: string, code: string) => Promise<string | null>
   signOut: () => Promise<void>

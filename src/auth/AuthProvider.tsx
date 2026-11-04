@@ -23,13 +23,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       configured: supabase !== null,
       loading,
       session,
-      async sendCode(email) {
+      async sendCode(email, opts) {
         if (!supabase) return 'Not connected'
         const { error } = await supabase.auth.signInWithOtp({
           email,
           options: {
-            // Only people a parent has added can sign in.
-            shouldCreateUser: false,
+            // Only people with an invite can create an account; joining is checked in the database.
+            shouldCreateUser: opts?.newAccount ?? false,
             emailRedirectTo: window.location.origin + import.meta.env.BASE_URL,
           },
         })

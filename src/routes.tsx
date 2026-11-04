@@ -5,6 +5,7 @@ import { EditExercises } from './screens/plan/EditExercises'
 import { EditFeedPlan } from './screens/plan/EditFeedPlan'
 import { EditMedicines } from './screens/plan/EditMedicines'
 import { EditRoutines } from './screens/plan/EditRoutines'
+import { Family } from './screens/Family'
 import { Feeds } from './screens/Feeds'
 import { Meds } from './screens/Meds'
 import { Care } from './screens/Care'
@@ -28,6 +29,7 @@ export const appRoutes: RouteObject[] = [
       { path: 'bellas-plan/medicines', element: <EditMedicines /> },
       { path: 'bellas-plan/exercises', element: <EditExercises /> },
       { path: 'bellas-plan/routines', element: <EditRoutines /> },
+      { path: 'bellas-plan/family', element: <Family /> },
       { path: '*', element: <Navigate to="/" replace /> },
     ],
   },

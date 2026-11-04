@@ -126,10 +126,10 @@ export function BellasPlan() {
             summary={routines.data ? describeRoutines(routines.data) : null}
           />
           <SectionLink
-            to="/bellas-plan"
+            to="family"
             icon={<Zebra size={36} bg="#E6E9F4" />}
             title="Family & sharing"
-            summary={`${count(members.filter((m) => m.role === 'parent').length, 'parent')} · ${count(members.filter((m) => m.role === 'helper').length, 'helper')} · invites coming soon`}
+            summary={`${count(members.filter((m) => m.role === 'parent').length, 'parent')} · ${count(members.filter((m) => m.role === 'helper').length, 'helper')}`}
           />
         </nav>
 

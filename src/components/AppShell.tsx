@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
+import { InstallHelp } from '../family/InstallHelp'
 import { BottomTabs } from './BottomTabs'
 import { SideRail } from './SideRail'
 
@@ -14,7 +15,8 @@ function ScrollToTop() {
 /** Bottom tabs on phones, side rail on tablets (SPEC §6). */
 export function AppShell() {
   // Plan edit screens have their own bottom bar (Tell everyone + Save) instead of the tabs.
-  const editing = useLocation().pathname.startsWith('/bellas-plan/')
+  const { pathname } = useLocation()
+  const editing = pathname.startsWith('/bellas-plan/') && pathname !== '/bellas-plan/family'
   return (
     <div className="min-h-dvh md:flex">
       <ScrollToTop />
@@ -23,6 +25,7 @@ export function AppShell() {
         <Outlet />
       </main>
       {!editing && <BottomTabs className="md:hidden" />}
+      <InstallHelp />
     </div>
   )
 }

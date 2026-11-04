@@ -10,7 +10,7 @@ describe('SignIn', () => {
     renderWith(<SignIn />, { auth })
     await userEvent.type(screen.getByLabelText(/Your email/), ' dad@example.com ')
     await userEvent.click(screen.getByRole('button', { name: 'Email me a code' }))
-    expect(auth.sendCode).toHaveBeenCalledWith('dad@example.com')
+    expect(auth.sendCode).toHaveBeenCalledWith('dad@example.com', { newAccount: false })
 
     await userEvent.type(screen.getByLabelText('Sign-in code'), '123 456')
     await userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
