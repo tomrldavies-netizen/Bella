@@ -135,5 +135,8 @@ Some phases add a new SQL file to `supabase/migrations/`. Run each one **once, i
 | 4 | [`20261105000000_phase4_logging.sql`](https://github.com/tomrldavies-netizen/Bella/blob/main/supabase/migrations/20261105000000_phase4_logging.sql) | Double-dose check when marking a medicine given |
 | 5 | [`20261106000000_phase5_care.sql`](https://github.com/tomrldavies-netizen/Bella/blob/main/supabase/migrations/20261106000000_phase5_care.sql) | Normal temperature range in Obs & routines |
 | 6 | [`20261107000000_phase6_family.sql`](https://github.com/tomrldavies-netizen/Bella/blob/main/supabase/migrations/20261107000000_phase6_family.sql) | Invites, joining, own name and colour, one household only |
+| 7 | [`20261108000000_phase7_plan_summary.sql`](https://github.com/tomrldavies-netizen/Bella/blob/main/supabase/migrations/20261108000000_phase7_plan_summary.sql) | Prescriptions, supply counts for helpers, freezer stock, private photo storage for Bella's firsts |
+
+After running the phase 7 file, check **Storage** in the Supabase sidebar: there should be a bucket called **firsts** marked **Private**. Don't make it public.
 
 If a file has already been run, running it again gives an error like "already exists". That's harmless, but nothing more is needed.

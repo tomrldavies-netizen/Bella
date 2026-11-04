@@ -14,6 +14,9 @@ import { NamePill } from '../components/NamePill'
 import { ScreenHeader } from '../components/ScreenHeader'
 import { ukParts } from '../lib/ukTime'
 import { formatDose } from '../plan/medicines'
+import { openBottle, updatePrescription } from '../organise/api'
+import { currentPrescription, prescriptionStatus } from '../organise/prescriptions'
+import { currentTime } from '../lib/ukTime'
 
 const STATUS_CHIP: Record<Exclude<DoseStatus, 'given'>, { text: string; cls: string }> = {
   due: { text: 'Due', cls: 'bg-meds text-alert' },
@@ -41,6 +44,21 @@ export function Meds() {
   const dueLabel = !next ? '' : mins > 0 ? `DUE IN ${countdown(next.scheduledFor, t.now).toUpperCase()}` : mins === 0 ? 'DUE NOW' : `${countdown(next.scheduledFor, t.now).replace(' ago', '').toUpperCase()} LATE`
 
   const editingMed = editing ? meds.find((m) => m.id === editing.medicine_id) : undefined
+  const rxRows = meds
+    .filter((m) => m.active)
+    .flatMap((med) => {
+      const rx = currentPrescription(t.prescriptions, med.id)
+      const st = rx ? prescriptionStatus(rx, med, t.today) : null
+      return rx && st ? [{ med, rx, st }] : []
+    })
+  const rxAct = async (fn: () => Promise<unknown>, msg: string) => {
+    try {
+      await fn()
+      setToast(msg)
+    } catch (e) {
+      setToast(e instanceof Error ? e.message : String(e))
+    }
+  }
 
   return (
     <>
@@ -124,6 +142,42 @@ export function Meds() {
             </Link>
           )}
         </section>
+
+        {rxRows.length > 0 && (
+          <section aria-labelledby="prescriptions" className="flex flex-col gap-2">
+            <h2 id="prescriptions" className="m-0 text-xl font-bold">
+              Prescriptions
+            </h2>
+            <Card className="flex flex-col px-3.5 py-1">
+              {rxRows.map(({ med, rx, st }) => (
+                <div key={rx.id} className="flex min-h-[52px] flex-col gap-2 border-b border-line-soft py-2 last:border-b-0 sm:flex-row sm:items-center">
+                  <span className="flex min-w-0 flex-1 flex-col">
+                    <span className="text-sm font-extrabold">{med.name}</span>
+                    <span className={`text-xs ${st.low ? 'font-bold text-alert' : 'text-ink-muted'}`}>
+                      About {st.daysLeft} day{st.daysLeft === 1 ? '' : 's'} left{st.reordered ? ' · reordered' : st.low ? ' · time to reorder' : ''}
+                    </span>
+                  </span>
+                  {t.me.role === 'parent' && (
+                    <span className="flex gap-1.5">
+                      {st.low && (
+                        <button type="button" onClick={() => rxAct(() => updatePrescription(rx.id, { reordered_at: currentTime().toISOString() }), 'Marked reordered')} className="h-10 rounded-full bg-primary px-3 text-xs font-extrabold text-white">
+                          Reordered
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => rxAct(() => openBottle(t.householdId, med.id, rx.bottle_volume, rx.reorder_threshold_days), 'New bottle logged')}
+                        className="h-10 rounded-full border-[1.5px] border-meds-accent bg-meds px-3 text-xs font-extrabold"
+                      >
+                        New bottle opened
+                      </button>
+                    </span>
+                  )}
+                </div>
+              ))}
+            </Card>
+          </section>
+        )}
       </div>
 
       {giving && (

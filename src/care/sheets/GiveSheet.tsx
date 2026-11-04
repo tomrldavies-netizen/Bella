@@ -105,7 +105,7 @@ export function GiveSheet({
           {dose !== slot.dose && <p className="m-0 text-xs font-bold text-alert">Different from the plan ({formatDose(slot.dose, slot.unit)}).</p>}
           <label className="flex items-center justify-between gap-2">
             <span className="text-[13px] font-extrabold whitespace-nowrap">Given at</span>
-            <input type="time" value={time} onChange={(e) => e.target.value && setTime(e.target.value)} className={`${fieldClass} w-32`} />
+            <input type="time" value={time} onChange={(e) => e.target.value && setTime(e.target.value)} className={`${fieldClass} !w-32`} />
           </label>
           {future && <ErrorNote>That time is in the future.</ErrorNote>}
           {error && <ErrorNote>{error}</ErrorNote>}

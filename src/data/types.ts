@@ -8,6 +8,8 @@ export type Member = {
   colour: string
   role: Role
   active: boolean
+  /** When they joined (used so old plan changes aren't shown as new). */
+  created_at?: string
 }
 
 export type Household = {

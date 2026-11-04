@@ -11,6 +11,11 @@ import { tubeStatus } from '../care/tube'
 import { obsDueAt, tempRangeOf } from '../care/obs'
 import { useToday } from '../care/useToday'
 import { Toast } from '../components/BottomSheet'
+import { PlanChangedBanner } from '../organise/PlanChangedBanner'
+import { careTaskStatus } from '../organise/careTasks'
+import { currentPrescription, prescriptionStatus } from '../organise/prescriptions'
+import { supplyLow } from '../organise/supplies'
+import { Zebra } from '../animals'
 import { Card, EmptyNote } from '../components/Card'
 import { ErrorNote } from '../components/Field'
 import { ClipboardIcon, PencilIcon } from '../components/Icons'
@@ -302,6 +307,30 @@ export function Today() {
     })
   }
 
+  const nextAppt = t.appointments.find((a) => Date.parse(a.starts_at) >= t.now.getTime() - 60 * 60_000) ?? null
+  if (nextAppt && Date.parse(nextAppt.starts_at) - t.now.getTime() < 7 * 86_400_000) {
+    const sameDay = ukParts(nextAppt.starts_at).date === t.today
+    cards.push({
+      key: 'appt',
+      to: '/plan',
+      tint: 'bg-plan',
+      icon: <Zebra size={30} />,
+      label: nextAppt.with_whom ?? 'Appointment',
+      big: sameDay ? countdown(nextAppt.starts_at, t.now) : new Date(nextAppt.starts_at).toLocaleDateString('en-GB', { weekday: 'short', timeZone: 'Europe/London' }),
+      detail: `${ukParts(nextAppt.starts_at).time}${nextAppt.location ? ` · ${nextAppt.location}` : ''}`,
+    })
+  }
+  for (const task of t.routines?.tasks ?? []) {
+    const st = careTaskStatus(task, t.careTaskLogs, t.today)
+    if (st.dueToday) cards.push({ key: `task-${task.id}`, to: '/plan', tint: 'bg-obs', icon: <Meerkat size={30} />, label: task.name, big: 'Today', detail: st.overdueDays ? `${st.overdueDays} day${st.overdueDays === 1 ? '' : 's'} late` : 'tick it off in Plan', alert: st.overdueDays > 0 })
+  }
+  const lowSupplies = t.supplies.filter(supplyLow)
+  const lowRx = meds.flatMap((m) => {
+    const rx = currentPrescription(t.prescriptions, m.id)
+    const st = m.active && rx ? prescriptionStatus(rx, m, t.today) : null
+    return st?.low ? [{ name: m.name, days: st.daysLeft }] : []
+  })
+
   const items = logs ? buildTimeline(logs, meds, t.exercises ?? [], range) : []
   const tummyMin = (logs?.tummy ?? []).reduce((sum, x) => sum + x.duration_min, 0)
   const tummyGoal = t.routines?.tummyGoalMin ?? 0
@@ -341,6 +370,7 @@ export function Today() {
         <div className="flex min-w-0 flex-col gap-4 md:gap-5">
           <TabletHeader now={t.now} />
           {t.error && <ErrorNote>Couldn't load today: {t.error}</ErrorNote>}
+          <PlanChangedBanner />
           <UpNext cards={cards} loading={!t.ready} />
           <QuickLog onNappy={() => setSheet('nappy')} onNote={() => setSheet('note')} />
           <Timeline items={items} loading={!t.ready} onOpen={setSheet} />
@@ -358,14 +388,37 @@ export function Today() {
               </span>
             </div>
           </section>
-          <section className="flex flex-col gap-1 rounded-[22px] bg-plan px-[18px] py-4">
+          <Link to="/plan" className="flex flex-col gap-1 rounded-[22px] bg-plan px-[18px] py-4 text-ink no-underline hover:text-ink">
             <h2 className="m-0 font-sans text-xs font-extrabold text-ink-deep uppercase">Next appointment</h2>
-            <EmptyNote>Appointments arrive in a later update.</EmptyNote>
-          </section>
-          <section className="flex flex-col gap-1 rounded-[22px] bg-growth px-[18px] py-4">
+            {nextAppt ? (
+              <>
+                <span className="font-display text-xl leading-tight font-extrabold">
+                  {new Date(nextAppt.starts_at).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'Europe/London' })} · {ukParts(nextAppt.starts_at).time}
+                </span>
+                <span className="text-sm">
+                  {nextAppt.with_whom}
+                  {nextAppt.location ? `, ${nextAppt.location}` : ''}
+                </span>
+              </>
+            ) : (
+              <EmptyNote>No appointments coming up.</EmptyNote>
+            )}
+          </Link>
+          <Link to="/plan" className="flex flex-col gap-1 rounded-[22px] bg-growth px-[18px] py-4 text-ink no-underline hover:text-ink">
             <h2 className="m-0 font-sans text-xs font-extrabold text-ink-deep uppercase">Running low</h2>
-            <EmptyNote>Supplies and prescriptions arrive in a later update.</EmptyNote>
-          </section>
+            {lowSupplies.length === 0 && lowRx.length === 0 ? (
+              <EmptyNote>{t.supplies.length || t.prescriptions.length ? 'Nothing running low.' : 'Add supplies in Plan to track them here.'}</EmptyNote>
+            ) : (
+              <>
+                {lowSupplies.length > 0 && <span className="text-sm font-bold">{lowSupplies.map((x) => `${x.name} (${x.quantity})`).join(' · ')}</span>}
+                {lowRx.map((r) => (
+                  <span key={r.name} className="text-sm font-bold">
+                    {r.name}, about {r.days} day{r.days === 1 ? '' : 's'}
+                  </span>
+                ))}
+              </>
+            )}
+          </Link>
         </aside>
       </div>
 

@@ -7,6 +7,7 @@ import { Card, EmptyNote } from '../components/Card'
 import { ErrorNote } from '../components/Field'
 import { fieldClass } from '../components/PlanEditLayout'
 import { ScreenHeader } from '../components/ScreenHeader'
+import { Firsts } from '../growth/Firsts'
 import { ageCards, chartPoints, chartScale, formatKg, pmaDays, signedGrams, weightGain, type ChartPoint } from '../growth/growth'
 import { useReadyHousehold } from '../household/HouseholdContext'
 import { useLiveQuery } from '../lib/useLiveQuery'
@@ -113,7 +114,7 @@ function WeighInSheet({
     <BottomSheet title={existing ? 'Edit weigh-in' : 'Add weigh-in'} onClose={onClose}>
       <label className="flex items-center justify-between gap-2">
         <span className={label}>Date</span>
-        <input type="date" value={date} max={today} onChange={(e) => e.target.value && setDate(e.target.value)} className={`${fieldClass} w-44`} />
+        <input type="date" value={date} max={today} onChange={(e) => e.target.value && setDate(e.target.value)} className={`${fieldClass} !w-44`} />
       </label>
       <div className="flex flex-col gap-1.5">
         <label htmlFor="weight-g" className={label}>
@@ -276,7 +277,7 @@ export function Growth() {
             </Card>
           </section>
         )}
-        <p className="m-0 text-xs text-ink-muted">Bella's firsts are coming in a later update.</p>
+        <Firsts householdId={household.id} babyName={baby.name} onToast={setToast} />
       </div>
 
       {sheet && (

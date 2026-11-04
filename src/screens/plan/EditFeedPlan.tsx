@@ -78,7 +78,7 @@ function FillHelper({ onFill }: { onFill: (slots: FeedSlot[]) => void }) {
       </div>
       <label className="flex items-center justify-between gap-2">
         <span className="text-sm font-extrabold">First feed</span>
-        <input type="time" value={first} onChange={(e) => e.target.value && setFirst(e.target.value)} className={`${fieldClass} w-32`} />
+        <input type="time" value={first} onChange={(e) => e.target.value && setFirst(e.target.value)} className={`${fieldClass} !w-32`} />
       </label>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-sm font-extrabold">Each feed</span>
@@ -245,7 +245,7 @@ function FeedPlanEditor({
                     aria-label={`Time of feed ${s.time}`}
                     value={s.time}
                     onChange={(e) => e.target.value && update(i, { time: e.target.value })}
-                    className={`${fieldClass} w-32`}
+                    className={`${fieldClass} !w-32`}
                   />
                   <span className="flex-1 truncate text-[13px] text-ink-muted">
                     {MILK_LABEL[s.milk]} · {formatNumber(s.ml)} ml
@@ -293,7 +293,7 @@ function FeedPlanEditor({
           ))}
           {!readOnly && editingTimes && (
             <div className="flex items-center gap-2 py-2">
-              <input type="time" aria-label="New feed time" value={newTime} onChange={(e) => setNewTime(e.target.value)} className={`${fieldClass} w-32`} />
+              <input type="time" aria-label="New feed time" value={newTime} onChange={(e) => setNewTime(e.target.value)} className={`${fieldClass} !w-32`} />
               <button type="button" disabled={!newTime} onClick={addFeed} className="h-11 rounded-full bg-primary px-4 text-sm font-extrabold text-white disabled:opacity-50">
                 Add feed
               </button>
@@ -336,7 +336,7 @@ function FeedPlanEditor({
           {startMode === 'custom' && (
             <div className="flex gap-2">
               <input type="date" aria-label="Start date" min={today.date} value={customDate} onChange={(e) => setCustomDate(e.target.value)} className={fieldClass} />
-              <input type="time" aria-label="Start time" value={customTime} onChange={(e) => setCustomTime(e.target.value)} className={`${fieldClass} w-32`} />
+              <input type="time" aria-label="Start time" value={customTime} onChange={(e) => setCustomTime(e.target.value)} className={`${fieldClass} !w-32`} />
             </div>
           )}
           <label className="flex flex-col gap-1">

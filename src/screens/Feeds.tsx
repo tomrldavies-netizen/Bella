@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Elephant } from '../animals'
 import { addLog, updateLog } from '../care/api'
 import { FeedForm } from '../care/FeedForm'
@@ -36,7 +37,7 @@ function TubeChangeSheet({ onSave, onClose }: { onSave: (nostril: 'left' | 'righ
       />
       <label className="flex items-center justify-between gap-2">
         <span className="text-[13px] font-extrabold">Put in at</span>
-        <input type="time" value={time} onChange={(e) => e.target.value && setTime(e.target.value)} className={`${fieldClass} w-32`} />
+        <input type="time" value={time} onChange={(e) => e.target.value && setTime(e.target.value)} className={`${fieldClass} !w-32`} />
       </label>
       {error && <ErrorNote>{error}</ErrorNote>}
       <button
@@ -121,7 +122,17 @@ export function Feeds() {
 
   return (
     <>
-      <ScreenHeader title="Feeds" subtitle={subtitle} tint="bg-feeds" guide={<Elephant size={56} cheeks />} />
+      <ScreenHeader
+        title="Feeds"
+        subtitle={subtitle}
+        tint="bg-feeds"
+        guide={<Elephant size={56} cheeks />}
+        action={
+          <Link to="/feeds/expressing" className="flex min-h-11 items-center rounded-full bg-card px-3 text-xs font-extrabold text-ink no-underline hover:text-ink">
+            Expressing
+          </Link>
+        }
+      />
       <div className="flex flex-col gap-3 px-4 pt-3.5 md:max-w-3xl md:px-7">
         {t.error && <ErrorNote>Couldn't load feeds: {t.error}</ErrorNote>}
 

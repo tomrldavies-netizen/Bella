@@ -12,6 +12,7 @@ import { useLiveQuery } from '../../lib/useLiveQuery'
 import { useNow } from '../../lib/useNow'
 import { addDaysIso, currentTime, friendlyDateTime, listWords, nextDailyTime, shortDate, ukNow, ukParts, ukToIso } from '../../lib/ukTime'
 import { loadMedicines, saveMedicine, type Medicine } from '../../plan/api'
+import { PrescriptionCard } from './PrescriptionCard'
 import {
   DOSE_FINE_STEP,
   DOSE_STEP,
@@ -306,7 +307,7 @@ function MedicineEditor({
             ))}
             {!readOnly && (
               <span className="flex items-center gap-1.5">
-                <input type="time" aria-label="New dose time" value={newTime} onChange={(e) => setNewTime(e.target.value)} className={`${fieldClass} h-[38px] w-28`} />
+                <input type="time" aria-label="New dose time" value={newTime} onChange={(e) => setNewTime(e.target.value)} className={`${fieldClass} h-[38px] !w-28`} />
                 <button
                   type="button"
                   disabled={!newTime || draft.times.includes(newTime)}
@@ -340,7 +341,7 @@ function MedicineEditor({
             {fromMode === 'custom' && (
               <div className="flex gap-2">
                 <input type="date" aria-label="Start date" min={today.date} value={customDate} onChange={(e) => setCustomDate(e.target.value)} className={fieldClass} />
-                <input type="time" aria-label="Start time" value={customTime} onChange={(e) => setCustomTime(e.target.value)} className={`${fieldClass} w-32`} />
+                <input type="time" aria-label="Start time" value={customTime} onChange={(e) => setCustomTime(e.target.value)} className={`${fieldClass} !w-32`} />
               </div>
             )}
           </div>
@@ -388,6 +389,8 @@ function MedicineEditor({
           </button>
         )}
       </Card>
+
+      {medicine && <PrescriptionCard householdId={householdId} medicine={medicine} readOnly={readOnly} />}
 
       {medicine && medicine.versions.length > 0 && (
         <details className="rounded-[18px] border-[1.5px] border-line bg-card px-4 py-2">

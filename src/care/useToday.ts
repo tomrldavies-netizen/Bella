@@ -4,6 +4,7 @@ import { useNow } from '../lib/useNow'
 import { addDaysIso, ukNow, ukToIso } from '../lib/ukTime'
 import { loadExercises, loadFeedPlans, loadMedicines, loadRoutines } from '../plan/api'
 import { loadDayLogs, loadGivenBetween, loadLatestObs, loadLatestTube } from './api'
+import { loadAppointments, loadCareTaskLogs, loadPrescriptions, loadSupplies } from '../organise/api'
 
 const LOG_TABLES = ['feeds', 'nappies', 'medicine_given', 'notes', 'tube_changes', 'obs', 'exercise_logs', 'tummy_time'] as const
 
@@ -27,6 +28,10 @@ export function useToday() {
   const scheduledGiven = useLiveQuery(hid, ['medicine_given'], (h) => loadGivenBetween(h, from, ukToIso(addDaysIso(today, 2), '00:00')), today)
   const exercises = useLiveQuery(hid, ['exercises', 'exercise_steps'], loadExercises)
   const lastObs = useLiveQuery(hid, ['obs'], (h) => loadLatestObs(h).then((latest) => ({ latest })))
+  const appointments = useLiveQuery(hid, ['appointments'], loadAppointments)
+  const supplies = useLiveQuery(hid, ['supplies'], loadSupplies)
+  const prescriptions = useLiveQuery(hid, ['prescriptions'], loadPrescriptions)
+  const careTaskLogs = useLiveQuery(hid, ['care_task_logs'], loadCareTaskLogs)
   const tube = useLiveQuery(hid, ['tube_changes'], (h) => loadLatestTube(h).then((latest) => ({ latest })))
 
   const error = logs.error ?? scheduledGiven.error ?? plans.error ?? medicines.error ?? routines.error ?? tube.error ?? exercises.error ?? lastObs.error
@@ -48,11 +53,19 @@ export function useToday() {
     tube: tube.data?.latest ?? null,
     exercises: exercises.data,
     lastObs: lastObs.data?.latest ?? null,
+    // Extras for Up next and the tablet side panel; empty until loaded.
+    appointments: appointments.data ?? [],
+    supplies: supplies.data ?? [],
+    prescriptions: prescriptions.data ?? [],
+    careTaskLogs: careTaskLogs.data ?? [],
     reload: () => {
       logs.reload()
       scheduledGiven.reload()
       tube.reload()
       lastObs.reload()
+      supplies.reload()
+      prescriptions.reload()
+      careTaskLogs.reload()
     },
   }
 }

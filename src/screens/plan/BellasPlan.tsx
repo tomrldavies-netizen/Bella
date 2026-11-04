@@ -13,6 +13,8 @@ import { useLiveQuery } from '../../lib/useLiveQuery'
 import { useNow } from '../../lib/useNow'
 import { friendlyDateTime } from '../../lib/ukTime'
 import { loadExercises, loadFeedPlans, loadMedicines, loadRecentChanges, loadRoutines } from '../../plan/api'
+import { loadSeen } from '../../organise/api'
+import { seenWords } from '../../organise/changes'
 import { describePlan } from '../../plan/feedPlan'
 import { describeRoutines } from '../../plan/routines'
 
@@ -61,6 +63,7 @@ export function BellasPlan() {
   const exercises = useLiveQuery(hid, ['exercises'], loadExercises)
   const routines = useLiveQuery(hid, ['settings', 'care_tasks'], loadRoutines)
   const changes = useLiveQuery(hid, ['plan_changes'], loadRecentChanges)
+  const seen = useLiveQuery(hid, ['plan_change_seen'], loadSeen)
 
   const now = useNow().getTime()
   const currentFeedPlan = feeds.data?.find((p) => Date.parse(p.effective_from) <= now) ?? feeds.data?.[feeds.data.length - 1]
@@ -148,6 +151,7 @@ export function BellasPlan() {
                 <span className="text-sm font-bold">{c.summary}</span>
                 <span className="text-xs text-ink-muted">
                   {nameOf(c.changed_by)} · {friendlyDateTime(c.created_at)}
+                  {seen.data && seenWords(c, members, seen.data) ? ` · ${seenWords(c, members, seen.data)}` : ''}
                 </span>
               </div>
             ))}

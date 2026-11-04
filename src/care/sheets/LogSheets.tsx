@@ -227,7 +227,7 @@ export function EditEntrySheet({
       {entry.kind !== 'feed' && (
         <label className="flex items-center justify-between gap-2">
           <span className={label}>Time</span>
-          <input type="time" value={time} onChange={(e) => e.target.value && setTime(e.target.value)} className={`${fieldClass} w-32`} />
+          <input type="time" value={time} onChange={(e) => e.target.value && setTime(e.target.value)} className={`${fieldClass} !w-32`} />
         </label>
       )}
       {future && <ErrorNote>That time is in the future.</ErrorNote>}
