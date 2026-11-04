@@ -19,6 +19,8 @@
   --color-primary-dark: #2f5239;
   --color-primary-tint: #e3efe4;
   --color-alert: #a2502f;
+  --color-field: #f9f4ea;
+  --color-tabs: #f6efe3;
 
   /* Sections: tint + accent */
   --color-feeds: #dcebf2;

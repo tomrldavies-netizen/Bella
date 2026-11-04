@@ -124,3 +124,15 @@ Until invites arrive in phase 6:
 ## Running the app on a computer (optional)
 
 Copy `.env.example` to `.env.local` and fill in the same two values. `.env.local` is never committed.
+
+## Database updates in later phases
+
+Some phases add a new SQL file to `supabase/migrations/`. Run each one **once, in order**, the same way as step 2
+(SQL Editor → New query → paste the whole file → Run → "Success. No rows returned").
+
+| Phase | File | What it adds |
+|---|---|---|
+| 2 | `20261103000000_phase2_schema.sql` | Tables, roles and security rules |
+| 3 | [`20261104000000_phase3_plan.sql`](https://github.com/tomrldavies-netizen/Bella/blob/main/supabase/migrations/20261104000000_phase3_plan.sql) | Saving Bella's plan (feeds, medicines, exercises, routines) |
+
+If a file has already been run, running it again gives an error like "already exists". That's harmless, but nothing more is needed.

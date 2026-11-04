@@ -1,10 +1,5 @@
 import { Elephant, Giraffe, Hippo, LionCub, Meerkat, Zebra } from '../animals'
-import { useAuth } from '../auth/AuthContext'
-import { Card } from '../components/Card'
 import { ComingSoon } from '../components/ComingSoon'
-import { NamePill } from '../components/NamePill'
-import { useReadyHousehold } from '../household/HouseholdContext'
-import { ClipboardIcon } from '../components/Icons'
 import { ScreenHeader } from '../components/ScreenHeader'
 
 export function Feeds() {
@@ -98,57 +93,6 @@ export function Summary() {
           "The day's notes",
         ]}
       />
-    </>
-  )
-}
-
-function SignedInCard() {
-  const { me } = useReadyHousehold()
-  const { session, signOut } = useAuth()
-  return (
-    <div className="px-4 pt-3.5 md:px-7">
-      <Card className="flex flex-wrap items-center gap-3 px-4 py-3">
-        <NamePill member={me} />
-        <span className="min-w-0 flex-1 text-sm text-ink-muted">
-          Signed in as {session?.user.email} · {me.role === 'parent' ? 'Parent' : 'Helper'}
-        </span>
-        <button
-          type="button"
-          onClick={signOut}
-          className="min-h-11 rounded-full border-[1.5px] border-line bg-card px-4 text-sm font-extrabold text-ink"
-        >
-          Sign out
-        </button>
-      </Card>
-    </div>
-  )
-}
-
-export function BellasPlan() {
-  return (
-    <>
-      <ScreenHeader
-        title="Bella's plan"
-        subtitle="What she needs, and when"
-        tint="bg-bella-plan"
-        back={{ to: '/', label: 'Today' }}
-        guide={
-          <span className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-card text-ink">
-            <ClipboardIcon size={28} strokeWidth={1.8} />
-          </span>
-        }
-      />
-      <ComingSoon
-        items={[
-          'Feed plan: times, milk type and amounts',
-          'Medicines and dose changes',
-          'Physio and speech & language exercises',
-          'Obs and routines',
-          'Family & sharing',
-          'Recent changes',
-        ]}
-      />
-      <SignedInCard />
     </>
   )
 }
