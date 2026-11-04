@@ -1,7 +1,7 @@
 import { formatNumber, listWords } from '../lib/ukTime'
 
 export type MilkType = 'breast' | 'formula' | 'mix'
-export type FeedSlot = { time: string; milk: MilkType; ml: number }
+export type FeedSlot = { time: string; milk: MilkType; ml: number; /** Database id, when loaded. */ id?: string }
 
 export const MILK_LABEL: Record<MilkType, string> = {
   breast: 'Breast milk',

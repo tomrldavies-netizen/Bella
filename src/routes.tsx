@@ -5,7 +5,9 @@ import { EditExercises } from './screens/plan/EditExercises'
 import { EditFeedPlan } from './screens/plan/EditFeedPlan'
 import { EditMedicines } from './screens/plan/EditMedicines'
 import { EditRoutines } from './screens/plan/EditRoutines'
-import { Care, Feeds, Growth, Meds, Plan, Summary } from './screens/Sections'
+import { Feeds } from './screens/Feeds'
+import { Meds } from './screens/Meds'
+import { Care, Growth, Plan, Summary } from './screens/Sections'
 import { Today } from './screens/Today'
 
 export const appRoutes: RouteObject[] = [

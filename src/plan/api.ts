@@ -25,7 +25,7 @@ export type FeedPlanVersion = {
 }
 
 type FeedPlanRow = Omit<FeedPlanVersion, 'slots'> & {
-  feed_plan_slots: { time_of_day: string; milk_type: MilkType; volume_ml: number }[]
+  feed_plan_slots: { id: string; time_of_day: string; milk_type: MilkType; volume_ml: number }[]
 }
 
 /** All versions, newest first. */
@@ -33,14 +33,14 @@ export async function loadFeedPlans(householdId: string): Promise<FeedPlanVersio
   const rows = check<FeedPlanRow[]>(
     await db()
       .from('feed_plans')
-      .select('id, effective_from, note, created_by, feed_plan_slots(time_of_day, milk_type, volume_ml)')
+      .select('id, effective_from, note, created_by, feed_plan_slots(id, time_of_day, milk_type, volume_ml)')
       .eq('household_id', householdId)
       .order('effective_from', { ascending: false }),
   )
   return rows.map(({ feed_plan_slots, ...p }) => ({
     ...p,
     slots: feed_plan_slots
-      .map((s) => ({ time: hhmm(s.time_of_day), milk: s.milk_type, ml: Number(s.volume_ml) }))
+      .map((s) => ({ id: s.id, time: hhmm(s.time_of_day), milk: s.milk_type, ml: Number(s.volume_ml) }))
       .sort((a, b) => a.time.localeCompare(b.time)),
   }))
 }
@@ -61,8 +61,8 @@ export async function saveFeedPlan(args: {
       p_slots: args.slots.map((s) => ({ time_of_day: s.time, milk_type: s.milk, volume_ml: s.ml })),
       p_note: args.note,
       p_summary: args.summary,
-      p_before: args.before,
-      p_after: args.slots,
+      p_before: args.before?.map(({ time, milk, ml }) => ({ time, milk, ml })) ?? null,
+      p_after: args.slots.map(({ time, milk, ml }) => ({ time, milk, ml })),
       p_notify: args.notify,
     }),
   )

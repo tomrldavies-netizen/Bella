@@ -1,38 +1,6 @@
-import { Elephant, Giraffe, Hippo, LionCub, Meerkat, Zebra } from '../animals'
+import { Giraffe, Hippo, Meerkat, Zebra } from '../animals'
 import { ComingSoon } from '../components/ComingSoon'
 import { ScreenHeader } from '../components/ScreenHeader'
-
-export function Feeds() {
-  return (
-    <>
-      <ScreenHeader title="Feeds" subtitle="NG tube feeds and expressing" tint="bg-feeds" guide={<Elephant size={56} cheeks />} />
-      <ComingSoon
-        items={[
-          'Feed timer with by-mouth and via-tube volumes',
-          "The next planned feed from Bella's plan",
-          'NG tube card and tube change reminders',
-          'Expressing log and freezer stock',
-        ]}
-      />
-    </>
-  )
-}
-
-export function Meds() {
-  return (
-    <>
-      <ScreenHeader title="Medicines" subtitle="Today's doses" tint="bg-meds" guide={<LionCub size={56} smile />} />
-      <ComingSoon
-        items={[
-          "Today's schedule from Bella's plan: given, due or missed",
-          'Mark given, with a check so a dose is never logged twice',
-          'Dose history',
-          'Prescriptions and reorder reminders',
-        ]}
-      />
-    </>
-  )
-}
 
 export function Growth() {
   return (

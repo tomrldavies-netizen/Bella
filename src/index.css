@@ -50,6 +50,13 @@
   --color-grandma: #ece4f5;
   --color-grandad: #fbf0cf;
 
+  @keyframes sheet-up {
+    from {
+      transform: translateY(24px);
+      opacity: 0;
+    }
+  }
+
   --animate-drift: drift 18s ease-in-out infinite alternate;
   @keyframes drift {
     from {

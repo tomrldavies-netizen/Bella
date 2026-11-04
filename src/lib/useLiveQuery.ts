@@ -11,6 +11,8 @@ export function useLiveQuery<T>(
   householdId: string,
   tables: readonly string[],
   load: (householdId: string) => Promise<T>,
+  /** Reload when this changes too (e.g. the date). */
+  key = '',
 ): LiveQuery<T> {
   const [data, setData] = useState<T | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -27,7 +29,8 @@ export function useLiveQuery<T>(
         setError(null)
       })
       .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)))
-  }, [householdId])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- key is a deliberate reload trigger
+  }, [householdId, key])
 
   useEffect(() => {
     reload()
