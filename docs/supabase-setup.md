@@ -29,7 +29,33 @@ Do these steps once, in order. It takes about 15 minutes. Anything in `CAPITALS`
 
 ## 4. Put the 6-digit code in the sign-in email
 
-1. **Authentication** → **Emails** → **Templates** tab → **Magic Link**.
+Supabase only lets you change its emails once it sends them through your own email account
+("custom SMTP"). A Gmail account works and is free. It also lifts Supabase's limit on who can
+receive sign-in emails, which the grandparents will need later.
+
+### 4a. Make a Gmail app password
+
+1. Turn on 2-Step Verification for the Gmail account, if it isn't already: <https://myaccount.google.com/signinoptions/twosv>
+2. Go to <https://myaccount.google.com/apppasswords>.
+3. Name it `Bella Supabase` and click **Create**.
+4. Copy the 16-letter password it shows (ignore the spaces). You won't see it again.
+
+### 4b. Tell Supabase to send through Gmail
+
+1. **Authentication** → **Emails** → **SMTP Settings** tab (or click **Set up SMTP** on the template page).
+2. Turn on **Enable custom SMTP** and fill in:
+   - **Sender email:** YOUR GMAIL ADDRESS
+   - **Sender name:** `Bella's Safari`
+   - **Host:** `smtp.gmail.com`
+   - **Port:** `587`
+   - **Username:** YOUR GMAIL ADDRESS
+   - **Password:** the 16-letter app password
+   - Leave **Minimum interval** as it is.
+3. Click **Save changes**.
+
+### 4c. Edit the template
+
+1. **Authentication** → **Emails** → **Templates** → **Magic link or OTP**.
 2. Set **Subject** to `Your code for Bella's Safari`.
 3. Replace the **Body** with:
 

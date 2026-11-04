@@ -2,17 +2,7 @@ import type { Session } from '@supabase/supabase-js'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
 import { AuthContext, type AuthApi } from './AuthContext'
-
-function friendly(message: string): string {
-  if (/signups? not allowed|not allowed for otp|user not found/i.test(message)) {
-    return "That email isn't on Bella's list yet. Ask a parent to add you."
-  }
-  if (/expired|invalid/i.test(message)) return "That code didn't work. Check it, or send a new one."
-  if (/rate limit|too many|security purposes/i.test(message)) {
-    return 'Too many tries. Please wait a minute and try again.'
-  }
-  return message
-}
+import { friendly } from './friendly'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
@@ -43,12 +33,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             emailRedirectTo: window.location.origin + import.meta.env.BASE_URL,
           },
         })
-        return error ? friendly(error.message) : null
+        return error ? friendly(error.message, 'send') : null
       },
       async verifyCode(email, code) {
         if (!supabase) return 'Not connected'
         const { error } = await supabase.auth.verifyOtp({ email, token: code, type: 'email' })
-        return error ? friendly(error.message) : null
+        return error ? friendly(error.message, 'verify') : null
       },
       async signOut() {
         await supabase?.auth.signOut()
