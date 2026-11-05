@@ -23,6 +23,8 @@ export default defineConfig({
       },
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
+        // A fixed identity so Chrome treats every version as the same installed app.
+        id: base,
         name: "Bella's Safari",
         short_name: 'Bella',
         description: "Bella's shared care tracker",
@@ -34,8 +36,8 @@ export default defineConfig({
         background_color: '#FBF6EC',
         theme_color: '#FCE9D6',
         icons: [
-          { src: 'pwa-192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'pwa-512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'pwa-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'pwa-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
           { src: 'pwa-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
