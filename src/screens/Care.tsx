@@ -21,7 +21,7 @@ function Dots({ done, of, colour }: { done: number; of: number; colour: string }
   return (
     <span className="flex items-center gap-1" aria-hidden="true">
       {Array.from({ length: Math.max(of, done) }, (_, i) => (
-        <span key={i} className="h-2.5 w-2.5 rounded-full border-[1.5px]" style={{ borderColor: colour, background: i < done ? colour : 'transparent' }} />
+        <span key={i} className="h-2.5 w-2.5 rounded-full border-[1.5px] transition-colors duration-300" style={{ borderColor: colour, background: i < done ? colour : 'transparent' }} />
       ))}
     </span>
   )
@@ -72,7 +72,7 @@ function ExerciseGroup({
             </div>
             {e.steps.length > 0 && (
               <details>
-                <summary className="min-h-9 cursor-pointer content-center text-xs font-extrabold text-primary">How to do it</summary>
+                <summary className="min-h-11 cursor-pointer content-center text-xs font-extrabold text-primary">How to do it</summary>
                 <ol className="m-0 flex list-decimal flex-col gap-1 pb-1 pl-5 text-sm">
                   {e.steps.map((s, i) => (
                     <li key={i}>{s}</li>
@@ -212,7 +212,7 @@ export function Care() {
           </div>
           {goal > 0 && (
             <div className="h-2 rounded-full bg-line" role="progressbar" aria-label="Tummy time today" aria-valuenow={tummyMin} aria-valuemax={goal}>
-              <div className="h-2 rounded-full bg-physio-accent" style={{ width: `${Math.min(100, Math.round((tummyMin / goal) * 100))}%` }} />
+              <div className="h-2 rounded-full bg-physio-accent transition-[width] duration-500 ease-out" style={{ width: `${Math.min(100, Math.round((tummyMin / goal) * 100))}%` }} />
             </div>
           )}
           <div className="flex flex-wrap items-center justify-between gap-2">

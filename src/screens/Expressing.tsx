@@ -134,7 +134,7 @@ export function Expressing() {
                       q.reload()
                       setToast('Marked used')
                     }}
-                    className="h-10 rounded-full border-[1.5px] border-feeds-accent bg-feeds px-3.5 text-sm font-extrabold"
+                    className="h-11 rounded-full border-[1.5px] border-feeds-accent bg-feeds px-3.5 text-sm font-extrabold"
                   >
                     Used
                   </button>

@@ -108,7 +108,7 @@ export function EditExercises() {
           <summary className="min-h-11 cursor-pointer content-center text-sm font-extrabold">Retired ({retired.length})</summary>
           <div className="flex flex-wrap gap-1.5 pb-3">
             {retired.map((e) => (
-              <button key={e.id} type="button" onClick={() => go({ id: e.id })} className="h-10 rounded-full border-[1.5px] border-line px-3.5 text-[13px] font-bold text-ink-deep">
+              <button key={e.id} type="button" onClick={() => go({ id: e.id })} className="h-11 rounded-full border-[1.5px] border-line px-3.5 text-[13px] font-bold text-ink-deep">
                 {e.name}
               </button>
             ))}
@@ -267,7 +267,7 @@ function ExerciseEditor({
             </div>
           ))}
           {!readOnly && (
-            <button type="button" onClick={() => set({ steps: [...draft.steps, ''] })} className="min-h-10 self-start text-[13px] font-extrabold text-primary">
+            <button type="button" onClick={() => set({ steps: [...draft.steps, ''] })} className="min-h-11 self-start text-[13px] font-extrabold text-primary">
               + Add a step
             </button>
           )}

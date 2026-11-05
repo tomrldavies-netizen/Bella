@@ -115,18 +115,25 @@ export function Meds() {
                   key={`${s.medicineId}:${s.scheduledFor}`}
                   type="button"
                   onClick={() => (last ? setEditing(last) : setGiving(s))}
-                  aria-label={`${s.time} ${s.name} ${formatDose(s.dose, s.unit)}: ${status === 'given' ? `given by ${who?.display_name ?? 'someone'}` : STATUS_CHIP[status].text}`}
                   className="flex min-h-12 items-center gap-2.5 border-b border-line-soft py-1.5 text-left last:border-b-0"
                 >
                   <span className="w-[42px] shrink-0 text-[13px] font-extrabold">{s.time}</span>
+                  {' '}
                   <span className="min-w-0 flex-1 text-sm">
                     {s.name} {formatDose(last?.dose_given ?? s.dose, s.unit)}
                     {done.length > 1 && <span className="ml-1 text-xs font-bold text-alert">· given {done.length} times</span>}
                   </span>
+                  <span className="sr-only">:</span>{' '}
                   {status === 'given' ? (
                     <span className="flex shrink-0 items-center gap-1.5">
+                      <span className="sr-only">given at</span>{' '}
                       <span className="text-xs text-ink-muted">{ukParts(last.given_at).time}</span>
-                      {who && <NamePill member={who} className="!px-2 !py-[3px]" />}
+                      {who && (
+                        <>
+                          {' '}<span className="sr-only">by</span>{' '}
+                          <NamePill member={who} className="!px-2 !py-[3px]" />
+                        </>
+                      )}
                     </span>
                   ) : (
                     <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-extrabold ${STATUS_CHIP[status].cls}`}>{STATUS_CHIP[status].text}</span>
@@ -160,14 +167,14 @@ export function Meds() {
                   {t.me.role === 'parent' && (
                     <span className="flex gap-1.5">
                       {st.low && (
-                        <button type="button" onClick={() => rxAct(() => updatePrescription(rx.id, { reordered_at: currentTime().toISOString() }), 'Marked reordered')} className="h-10 rounded-full bg-primary px-3 text-xs font-extrabold text-white">
+                        <button type="button" onClick={() => rxAct(() => updatePrescription(rx.id, { reordered_at: currentTime().toISOString() }), 'Marked reordered')} className="h-11 rounded-full bg-primary px-3 text-xs font-extrabold text-white">
                           Reordered
                         </button>
                       )}
                       <button
                         type="button"
                         onClick={() => rxAct(() => openBottle(t.householdId, med.id, rx.bottle_volume, rx.reorder_threshold_days), 'New bottle logged')}
-                        className="h-10 rounded-full border-[1.5px] border-meds-accent bg-meds px-3 text-xs font-extrabold"
+                        className="h-11 rounded-full border-[1.5px] border-meds-accent bg-meds px-3 text-xs font-extrabold"
                       >
                         New bottle opened
                       </button>

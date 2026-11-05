@@ -30,14 +30,19 @@ export function SavannaScene({ className }: { className?: string }) {
         <ellipse cx="322" cy="91" rx="16" ry="6" fill="#B2CF9F" />
         {/* Elephant from the header, placed at (220, 96) and drawn 74 px wide. */}
         <g transform="translate(220 96) scale(1.6818)">
-          <circle cx="11" cy="20" r="8" fill="#9DB8C9" />
-          <circle cx="33" cy="20" r="8" fill="#9DB8C9" />
-          <circle cx="22" cy="21" r="10.5" fill="#B7CEDB" />
-          <path d="M22 27 q0 8 -5 10" stroke="#B7CEDB" strokeWidth="5" fill="none" strokeLinecap="round" />
-          <circle cx="18.5" cy="19" r="1.4" fill="#3B3127" />
-          <circle cx="25.5" cy="19" r="1.4" fill="#3B3127" />
-          <circle cx="15.5" cy="24" r="1.7" fill="#F4C3B2" />
-          <circle cx="28.5" cy="24" r="1.7" fill="#F4C3B2" />
+          {/* Gentle breathing and the odd blink (off with "Reduce motion"). */}
+          <g className="svg-centre motion-safe:animate-breathe">
+            <circle cx="11" cy="20" r="8" fill="#9DB8C9" />
+            <circle cx="33" cy="20" r="8" fill="#9DB8C9" />
+            <circle cx="22" cy="21" r="10.5" fill="#B7CEDB" />
+            <path d="M22 27 q0 8 -5 10" stroke="#B7CEDB" strokeWidth="5" fill="none" strokeLinecap="round" />
+            <g className="svg-centre motion-safe:animate-blink">
+              <circle cx="18.5" cy="19" r="1.4" fill="#3B3127" />
+              <circle cx="25.5" cy="19" r="1.4" fill="#3B3127" />
+            </g>
+            <circle cx="15.5" cy="24" r="1.7" fill="#F4C3B2" />
+            <circle cx="28.5" cy="24" r="1.7" fill="#F4C3B2" />
+          </g>
         </g>
       </svg>
     </div>

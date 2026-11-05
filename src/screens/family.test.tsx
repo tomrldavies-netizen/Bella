@@ -65,7 +65,7 @@ describe('Family & sharing', () => {
 
   it('resends an invite with a new link', async () => {
     renderRoutes('/bellas-plan/family', { household: household() })
-    await userEvent.click(await screen.findByRole('button', { name: /^Grandad, invited/ }))
+    await userEvent.click(await screen.findByRole('button', { name: /^Grandad, Invited/ }))
     await userEvent.click(screen.getByRole('button', { name: 'Resend (new link, 7 more days)' }))
     await waitFor(() => expect(api.resendInvite).toHaveBeenCalledWith('i1'))
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith(expect.stringContaining('fresh0123456789abcdef01'))

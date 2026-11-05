@@ -327,7 +327,7 @@ export function PlanScreen() {
               Appointments
             </h2>
             {isParent && (
-              <button type="button" onClick={() => setSheet({ kind: 'appt', a: null })} className="min-h-11 text-[13px] font-extrabold text-primary">
+              <button type="button" onClick={() => setSheet({ kind: 'appt', a: null })} className="min-h-11 px-2 text-[13px] font-extrabold text-primary">
                 + Add
               </button>
             )}
@@ -360,9 +360,11 @@ export function PlanScreen() {
                   aria-label={`Mark answered: ${q.text}`}
                   aria-pressed={false}
                   onClick={() => setSheet({ kind: 'q', q: { ...q, answered: true } })}
-                  className="h-7 w-7 shrink-0 rounded-full border-2 border-plan-accent bg-card"
-                />
-                <button type="button" onClick={() => setSheet({ kind: 'q', q })} className="min-w-0 flex-1 text-left text-sm">
+                  className="-m-2 flex h-11 w-11 shrink-0 items-center justify-center"
+                >
+                  <span aria-hidden="true" className="h-7 w-7 rounded-full border-2 border-plan-accent bg-card" />
+                </button>
+                <button type="button" onClick={() => setSheet({ kind: 'q', q })} className="min-h-11 min-w-0 flex-1 text-left text-sm">
                   {q.text}
                 </button>
                 <span className="max-w-[38%] shrink-0 truncate rounded-full bg-plan px-2 py-0.5 text-xs font-bold">{apptName(q.appointment_id)}</span>
@@ -421,7 +423,7 @@ export function PlanScreen() {
               Supplies
             </h2>
             {isParent && (
-              <button type="button" onClick={() => setSheet({ kind: 'supply', s: null })} className="min-h-11 text-[13px] font-extrabold text-primary">
+              <button type="button" onClick={() => setSheet({ kind: 'supply', s: null })} className="min-h-11 px-2 text-[13px] font-extrabold text-primary">
                 + Add
               </button>
             )}
@@ -450,7 +452,7 @@ export function PlanScreen() {
               const low = supplyLow(s)
               return (
                 <div key={s.id} className="flex min-h-[52px] items-center gap-2 border-b border-line-soft py-1.5 last:border-b-0">
-                  <button type="button" disabled={!isParent} onClick={() => setSheet({ kind: 'supply', s })} className="flex min-w-0 flex-1 flex-col text-left">
+                  <button type="button" disabled={!isParent} onClick={() => setSheet({ kind: 'supply', s })} className="flex min-h-11 min-w-0 flex-1 flex-col justify-center text-left">
                     <span className="text-sm font-extrabold">{s.name}</span>
                     <span className={`text-xs ${low ? 'font-bold text-alert' : 'text-ink-muted'}`}>
                       {s.quantity} left{s.to_order ? ' · order' : low ? ' · running low' : ''}
@@ -503,7 +505,7 @@ export function PlanScreen() {
                     </span>
                   </span>
                   {st.doneToday && todayLog ? (
-                    <button type="button" onClick={() => act(async () => (await untickCareTask(todayLog.id), taskLogs.reload()), 'Undone')} className="h-10 rounded-full bg-obs px-3.5 text-sm font-extrabold text-primary">
+                    <button type="button" onClick={() => act(async () => (await untickCareTask(todayLog.id), taskLogs.reload()), 'Undone')} className="h-11 rounded-full bg-obs px-3.5 text-sm font-extrabold text-primary">
                       ✓ Done
                     </button>
                   ) : (
@@ -511,7 +513,7 @@ export function PlanScreen() {
                       type="button"
                       aria-label={`${t.name} done`}
                       onClick={() => act(async () => (await tickCareTask(hid, t.id!), taskLogs.reload()), `${t.name} done`)}
-                      className="h-10 rounded-full border-[1.5px] border-obs-accent bg-card px-3.5 text-sm font-extrabold"
+                      className="h-11 rounded-full border-[1.5px] border-obs-accent bg-card px-3.5 text-sm font-extrabold"
                     >
                       Done
                     </button>

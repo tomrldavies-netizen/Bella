@@ -55,6 +55,7 @@ export function EditMedicines() {
 
   const tabs = (
     <>
+      <div className="flex flex-wrap gap-1.5">
       <div role="tablist" aria-label="Medicines" className="flex flex-wrap gap-1.5">
         {active.map((m) => {
           const on = selected !== 'new' && selected?.id === m.id
@@ -65,17 +66,18 @@ export function EditMedicines() {
               role="tab"
               aria-selected={on}
               onClick={() => select(m.id)}
-              className={`h-10 rounded-full border-[1.5px] px-3.5 text-[13px] ${on ? 'border-meds-accent bg-meds font-extrabold' : 'border-line bg-card font-bold text-ink-deep'}`}
+              className={`h-11 rounded-full border-[1.5px] px-3.5 text-[13px] ${on ? 'border-meds-accent bg-meds font-extrabold' : 'border-line bg-card font-bold text-ink-deep'}`}
             >
               {m.name}
             </button>
           )
         })}
+      </div>
         {!readOnly && (
           <button
             type="button"
             onClick={() => select('new')}
-            className={`h-10 rounded-full border-[1.5px] border-dashed px-3.5 text-[13px] font-extrabold ${selected === 'new' ? 'border-meds-accent bg-meds' : 'border-line text-primary'}`}
+            className={`h-11 rounded-full border-[1.5px] border-dashed px-3.5 text-[13px] font-extrabold ${selected === 'new' ? 'border-meds-accent bg-meds' : 'border-line text-primary'}`}
           >
             + New
           </button>
@@ -86,7 +88,7 @@ export function EditMedicines() {
           <summary className="min-h-11 cursor-pointer content-center text-sm font-extrabold">Stopped medicines ({stopped.length})</summary>
           <div className="flex flex-wrap gap-1.5 pb-3">
             {stopped.map((m) => (
-              <button key={m.id} type="button" onClick={() => select(m.id)} className="h-10 rounded-full border-[1.5px] border-line px-3.5 text-[13px] font-bold text-ink-deep">
+              <button key={m.id} type="button" onClick={() => select(m.id)} className="h-11 rounded-full border-[1.5px] border-line px-3.5 text-[13px] font-bold text-ink-deep">
                 {m.name}
               </button>
             ))}

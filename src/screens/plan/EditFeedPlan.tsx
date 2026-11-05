@@ -28,6 +28,9 @@ import {
 const FEED_STEP = 5
 const FEED_FINE_STEP = 1
 
+/** Short names so the row fits on a phone beside 44 px steppers. */
+const MILK_SHORT: Record<MilkType, string> = { breast: 'Breast', formula: 'Formula', mix: 'Mix' }
+
 const MILK_STYLE: Record<MilkType, string> = {
   breast: 'bg-feeds border-feeds-accent',
   formula: 'bg-growth border-growth-accent',
@@ -219,10 +222,10 @@ function FeedPlanEditor({
       {!readOnly && sorted.length > 0 && (
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-[13px] font-extrabold">Set all to</span>
-          <button type="button" onClick={() => setSlots((all) => all.map((s) => ({ ...s, milk: 'breast' })))} className={`h-10 rounded-full border-[1.5px] px-3 text-[13px] font-extrabold ${MILK_STYLE.breast}`}>
+          <button type="button" onClick={() => setSlots((all) => all.map((s) => ({ ...s, milk: 'breast' })))} className={`h-11 rounded-full border-[1.5px] px-3 text-[13px] font-extrabold ${MILK_STYLE.breast}`}>
             Breast milk
           </button>
-          <button type="button" onClick={() => setSlots((all) => all.map((s) => ({ ...s, milk: 'formula' })))} className={`h-10 rounded-full border-[1.5px] px-3 text-[13px] font-extrabold ${MILK_STYLE.formula}`}>
+          <button type="button" onClick={() => setSlots((all) => all.map((s) => ({ ...s, milk: 'formula' })))} className={`h-11 rounded-full border-[1.5px] px-3 text-[13px] font-extrabold ${MILK_STYLE.formula}`}>
             Formula
           </button>
           {interval && <span className="ml-auto text-xs font-bold text-ink-deep">{interval}</span>}
@@ -263,7 +266,7 @@ function FeedPlanEditor({
                 <>
                   <span className="w-[46px] shrink-0 text-sm font-extrabold">{s.time}</span>
                   {readOnly ? (
-                    <span className={`flex h-[38px] flex-1 items-center rounded-xl border-[1.5px] px-2.5 text-[13px] font-extrabold ${MILK_STYLE[s.milk]}`}>
+                    <span className={`flex h-11 flex-1 items-center rounded-xl border-[1.5px] px-2.5 text-[13px] font-extrabold ${MILK_STYLE[s.milk]}`}>
                       {MILK_LABEL[s.milk]}
                     </span>
                   ) : (
@@ -271,9 +274,12 @@ function FeedPlanEditor({
                       type="button"
                       aria-label={`${s.time} milk: ${MILK_LABEL[s.milk]}. Tap to change`}
                       onClick={() => update(i, { milk: cycleMilk(s.milk) })}
-                      className={`flex h-[38px] min-w-0 flex-1 items-center justify-between gap-1 rounded-xl border-[1.5px] px-2.5 text-[13px] font-extrabold ${MILK_STYLE[s.milk]}`}
+                      className={`flex h-11 min-w-0 flex-1 items-center justify-between gap-1 rounded-xl border-[1.5px] px-2.5 text-[13px] font-extrabold ${MILK_STYLE[s.milk]}`}
                     >
-                      <span className="truncate">{MILK_LABEL[s.milk]}</span>
+                      <span className="truncate">
+                        <span className="sm:hidden">{MILK_SHORT[s.milk]}</span>
+                        <span className="hidden sm:inline">{MILK_LABEL[s.milk]}</span>
+                      </span>
                       <CycleIcon size={16} className="shrink-0 opacity-70" />
                     </button>
                   )}

@@ -41,8 +41,13 @@ export function Toast({ message, onUndo, onDone }: { message: string; onUndo?: (
     return () => clearTimeout(t)
   }, [onDone])
   return (
-    <div role="status" className="fixed inset-x-4 bottom-[calc(92px+env(safe-area-inset-bottom))] z-30 mx-auto flex max-w-md items-center justify-between gap-3 rounded-2xl bg-ink px-4 py-2.5 text-sm font-bold text-white md:bottom-6">
-      {message}
+    <div role="status" className="fixed inset-x-4 bottom-[calc(92px+env(safe-area-inset-bottom))] z-30 mx-auto flex max-w-md items-center justify-between gap-3 rounded-2xl bg-ink px-4 py-2.5 text-sm font-bold text-white motion-safe:animate-pop md:bottom-6">
+      <span className="flex items-center gap-2">
+        {!/^(couldn|could not|you're offline)|error/i.test(message) && (
+          <span aria-hidden="true" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-xs motion-safe:animate-pop">✓</span>
+        )}
+        {message}
+      </span>
       {onUndo && (
         <button type="button" onClick={onUndo} className="min-h-11 px-2 font-extrabold text-growth">
           Undo

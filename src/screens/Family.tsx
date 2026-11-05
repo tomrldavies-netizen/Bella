@@ -341,7 +341,6 @@ export function Family() {
               key={m.id}
               type="button"
               onClick={() => setSheet(m)}
-              aria-label={`${m.display_name}${m.id === me.id ? ' (you)' : ''}, ${ROLE_LABEL[m.role]}`}
               className="flex min-h-14 items-center gap-3 border-b border-line-soft py-2 text-left last:border-b-0">
               <Avatar name={m.display_name} colour={m.colour} />
               <span className="flex min-w-0 flex-1 flex-col">
@@ -349,9 +348,12 @@ export function Family() {
                   {m.display_name}
                   {m.id === me.id ? ' (you)' : ''}
                 </span>
-                <span className="text-xs text-ink-muted">{m.id === me.id ? 'Tap to change your name and colour' : ROLE_LABEL[m.role]}</span>
+                <span className="sr-only">, {ROLE_LABEL[m.role]}.</span>{' '}
+                <span className="text-xs text-ink-muted">{m.id === me.id ? 'Tap to change your name and colour' : isParent ? 'Tap to change their role' : 'In the family'}</span>
               </span>
-              <span className={`rounded-full px-2.5 py-1 text-xs font-extrabold ${m.role === 'parent' ? 'bg-primary-tint text-primary' : 'bg-tabs text-ink-deep'}`}>{ROLE_LABEL[m.role]}</span>
+              <span aria-hidden="true" className={`rounded-full px-2.5 py-1 text-xs font-extrabold ${m.role === 'parent' ? 'bg-primary-tint text-primary' : 'bg-tabs text-ink-deep'}`}>
+                {ROLE_LABEL[m.role]}
+              </span>
             </button>
           ))}
           {(invites.data ?? []).map((i) => {
@@ -361,13 +363,14 @@ export function Family() {
                 key={i.id}
                 type="button"
                 onClick={() => setSheet(i)}
-                aria-label={`${i.display_name}, ${expired ? 'invite expired' : 'invited, not set up yet'}. Resend or cancel`}
                 className="flex min-h-14 items-center gap-3 border-b border-line-soft py-2 text-left last:border-b-0">
                 <Avatar name={i.display_name} colour="#F3EADC" />
                 <span className="flex min-w-0 flex-1 flex-col">
                   <span className="text-[15px] font-extrabold">{i.display_name}</span>
+                  <span className="sr-only">,</span>{' '}
                   <span className={`text-xs ${expired ? 'font-bold text-alert' : 'text-ink-muted'}`}>{expired ? 'Invite expired' : 'Invited, not set up yet'}</span>
                 </span>
+                <span className="sr-only">.</span>{' '}
                 <span className="rounded-full border-[1.5px] border-line px-3 py-1 text-xs font-extrabold text-primary">Resend</span>
               </button>
             )

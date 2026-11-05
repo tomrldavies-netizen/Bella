@@ -26,7 +26,9 @@ import { formatLongDate, greeting } from '../lib/dates'
 import { formatNumber, ukParts } from '../lib/ukTime'
 import { formatDose } from '../plan/medicines'
 
-const pillClass = 'rounded-full bg-card px-2.5 py-[5px] text-xs font-bold text-ink no-underline hover:text-ink'
+// The pill stays small; the tap area around it is 44 px tall.
+const pillClass =
+  "relative rounded-full bg-card px-2.5 py-[5px] text-xs font-bold text-ink no-underline before:absolute before:-inset-y-[9px] before:inset-x-0 before:content-[''] hover:text-ink"
 
 /** Actual age, corrected age and due-date countdown; each opens Growth. */
 function AgePills({ now }: { now: Date }) {
@@ -130,7 +132,7 @@ function UpNext({ cards, loading }: { cards: UpNextCard[]; loading: boolean }) {
       <SectionTitle
         id="up-next"
         aside={
-          <Link to="/summary" className="text-[13px] font-bold">
+          <Link to="/summary" className="inline-flex min-h-11 items-center text-[13px] font-bold">
             Daily summary
           </Link>
         }
@@ -218,14 +220,24 @@ function Timeline({ items, loading, onOpen }: { items: TimelineItem[]; loading: 
               key={i.key}
               type="button"
               onClick={() => onOpen(i)}
-              aria-label={`${i.time} ${i.text}${who ? `, ${who.display_name}` : ''}${i.pending ? ', waiting to sync' : ''}. Tap to edit`}
               className="flex min-h-[46px] items-center gap-2.5 border-b border-line-soft py-1.5 text-left last:border-b-0 md:min-h-12 md:gap-3.5"
             >
               <span className="w-[42px] shrink-0 text-[13px] font-extrabold md:w-[50px] md:text-sm">{i.time}</span>
+              {' '}
               <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: i.colour }} />
               <span className={`min-w-0 flex-1 text-sm md:text-[15px] ${i.flagged ? 'font-bold text-alert' : ''}`}>{i.text}</span>
-              {i.pending && <span className="shrink-0 text-[11px] font-bold text-ink-muted">waiting to sync</span>}
-              {who && <NamePill member={who} className="shrink-0 !px-2 !py-[3px]" />}
+              {i.pending && (
+                <span className="shrink-0 text-[11px] font-bold text-ink-muted">
+                  <span className="sr-only">,</span>{' '}waiting to sync
+                </span>
+              )}
+              {who && (
+                <>
+                  <span className="sr-only">,</span>{' '}
+                  <NamePill member={who} className="shrink-0 !px-2 !py-[3px]" />
+                </>
+              )}
+              <span className="sr-only">.</span>{' '}<span className="sr-only">Tap to edit</span>
             </button>
           )
         })}
@@ -242,7 +254,7 @@ function Bar({ label, value, of, colour }: { label: string; value: string; of: n
         <span>{value}</span>
       </div>
       <div className="h-2 rounded-full bg-line">
-        <div className="h-2 rounded-full" style={{ width: `${Math.min(100, Math.round(of * 100))}%`, background: colour }} />
+        <div className="h-2 rounded-full transition-[width] duration-500 ease-out" style={{ width: `${Math.min(100, Math.round(of * 100))}%`, background: colour }} />
       </div>
     </div>
   )

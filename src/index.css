@@ -58,6 +58,34 @@
   }
 
   --animate-drift: drift 18s ease-in-out infinite alternate;
+  --animate-breathe: breathe 5s ease-in-out infinite;
+  --animate-blink: blink 6s ease-in-out infinite;
+  --animate-pop: pop 220ms ease-out;
+  @keyframes breathe {
+    0%,
+    100% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-1.5px) scale(1.015);
+    }
+  }
+  @keyframes blink {
+    0%,
+    94%,
+    100% {
+      transform: scaleY(1);
+    }
+    97% {
+      transform: scaleY(0.1);
+    }
+  }
+  @keyframes pop {
+    from {
+      transform: scale(0.92);
+      opacity: 0;
+    }
+  }
   @keyframes drift {
     from {
       transform: translateX(-6px);
@@ -90,6 +118,12 @@
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-primary;
   }
+}
+
+/* SVG parts animate around their own centre. */
+.svg-centre {
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
 @media (prefers-reduced-motion: reduce) {

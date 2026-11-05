@@ -60,7 +60,7 @@ function OptionalSetting({
         {readOnly ? (
           <span className="font-display text-lg font-extrabold">{value === null ? 'Not set' : text(value)}</span>
         ) : value === null ? (
-          <button type="button" onClick={() => onChange(startAt)} className="h-10 rounded-full border-[1.5px] border-primary px-4 text-[13px] font-extrabold text-primary">
+          <button type="button" onClick={() => onChange(startAt)} className="h-11 rounded-full border-[1.5px] border-primary px-4 text-[13px] font-extrabold text-primary">
             Set
           </button>
         ) : (
@@ -68,7 +68,7 @@ function OptionalSetting({
         )}
       </div>
       {!readOnly && value !== null && (
-        <button type="button" onClick={() => onChange(null)} className="min-h-9 self-end text-xs font-extrabold text-ink-muted">
+        <button type="button" onClick={() => onChange(null)} className="min-h-11 self-end px-2 text-xs font-extrabold text-ink-muted">
           Clear
         </button>
       )}
@@ -154,7 +154,7 @@ function RoutinesEditor({ initial, householdId, readOnly, onSaved }: { initial: 
               </span>
             ) : (
               draft.tempMinC === null && (
-                <button type="button" onClick={() => set({ tempMinC: 37, tempMaxC: 37 })} className="h-10 rounded-full border-[1.5px] border-primary px-4 text-[13px] font-extrabold text-primary">
+                <button type="button" onClick={() => set({ tempMinC: 37, tempMaxC: 37 })} className="h-11 rounded-full border-[1.5px] border-primary px-4 text-[13px] font-extrabold text-primary">
                   Set
                 </button>
               )
@@ -170,7 +170,7 @@ function RoutinesEditor({ initial, householdId, readOnly, onSaved }: { initial: 
                 <span className="text-[13px] font-bold">To</span>
                 <AmountStepper label="Highest normal temperature" value={draft.tempMaxC} onChange={(tempMaxC) => set({ tempMaxC })} step={0.1} min={30} max={45} unit="°C" size="sm" />
               </div>
-              <button type="button" onClick={() => set({ tempMinC: null, tempMaxC: null })} className="min-h-9 self-end text-xs font-extrabold text-ink-muted">
+              <button type="button" onClick={() => set({ tempMinC: null, tempMaxC: null })} className="min-h-11 self-end px-2 text-xs font-extrabold text-ink-muted">
                 Clear
               </button>
             </>

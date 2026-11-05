@@ -80,7 +80,7 @@ describe('Today', () => {
   it('lists today newest first with who logged it', async () => {
     renderRoutes('/')
     const rows = await screen.findAllByRole('button', { name: /Tap to edit/ })
-    expect(rows.map((r) => r.getAttribute('aria-label'))).toEqual([
+    expect(rows.map((r) => r.textContent)).toEqual([
       '19:40 Nappy · wet, Dad. Tap to edit',
       '18:05 Feed 50 ml · bottle 15 ml, tube 35 ml · breast milk, Dad. Tap to edit',
       '11:02 Iron 1.2 ml, Dad. Tap to edit',
@@ -122,7 +122,7 @@ describe('Today', () => {
 describe('Medicines', () => {
   it('shows the schedule with given and due doses', async () => {
     renderRoutes('/meds')
-    expect(await screen.findByRole('button', { name: '11:00 Iron 1.2 ml: given by Dad' })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: '11:00 Iron 1.2 ml: given at 11:02 by Dad' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '23:00 Iron 1.2 ml: Later' })).toBeInTheDocument()
     expect(screen.getByText('DUE IN 2 HR 25 MIN')).toBeInTheDocument()
   })

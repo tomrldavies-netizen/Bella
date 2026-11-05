@@ -44,12 +44,12 @@ export function AmountStepper({ label, value, onChange, step, fineStep, min = 0,
   }
   useEffect(() => stop, [])
 
-  const text = `${formatNumber(value)} ${unit}`
+  const text = unit ? `${formatNumber(value)} ${unit}` : formatNumber(value)
   if (readOnly) {
     return <span className="font-display text-lg font-extrabold">{text}</span>
   }
 
-  const btn = size === 'sm' ? 'h-9 w-9 text-lg' : 'h-11 w-11 text-xl'
+  const btn = size === 'sm' ? 'h-11 w-11 text-lg' : 'h-11 w-11 text-xl'
   const handlers = (dir: 1 | -1) => ({
     onPointerDown: () => {
       timers.current.held = false
@@ -76,12 +76,13 @@ export function AmountStepper({ label, value, onChange, step, fineStep, min = 0,
     },
   })
 
-  const fine = fineStep ? `, hold for ${formatNumber(fineStep)} ${unit}` : ''
+  const u = unit ? ` ${unit}` : ''
+  const fine = fineStep ? `, hold for ${formatNumber(fineStep)}${u}` : ''
   return (
     <div className="flex items-center gap-1" role="group" aria-label={label}>
       <button
         type="button"
-        aria-label={`${formatNumber(step)} ${unit} less${fine}`}
+        aria-label={`${formatNumber(step)}${u} less${fine}`}
         disabled={value <= min}
         className={`${btn} flex shrink-0 touch-manipulation items-center justify-center rounded-full bg-line-soft font-extrabold text-ink select-none disabled:opacity-40`}
         {...handlers(-1)}
@@ -96,7 +97,7 @@ export function AmountStepper({ label, value, onChange, step, fineStep, min = 0,
       </output>
       <button
         type="button"
-        aria-label={`${formatNumber(step)} ${unit} more${fine}`}
+        aria-label={`${formatNumber(step)}${u} more${fine}`}
         disabled={value >= max}
         className={`${btn} flex shrink-0 touch-manipulation items-center justify-center rounded-full bg-line-soft font-extrabold text-ink select-none disabled:opacity-40`}
         {...handlers(1)}
