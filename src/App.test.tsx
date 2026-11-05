@@ -105,3 +105,11 @@ describe('household details', () => {
     expect(auth.signOut).toHaveBeenCalled()
   })
 })
+
+describe('getting to Plan on a phone', () => {
+  it('Today always links to Plan & appointments', async () => {
+    renderAt('/')
+    await userEvent.click(await screen.findByRole('link', { name: 'Plan & appointments' }))
+    expect(await screen.findByRole('heading', { level: 1, name: 'Plan' })).toBeInTheDocument()
+  })
+})

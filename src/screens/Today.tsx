@@ -132,9 +132,15 @@ function UpNext({ cards, loading }: { cards: UpNextCard[]; loading: boolean }) {
       <SectionTitle
         id="up-next"
         aside={
-          <Link to="/summary" className="inline-flex min-h-11 items-center text-[13px] font-bold">
-            Daily summary
-          </Link>
+          <span className="flex gap-4">
+            {/* Plan (appointments, questions, supplies) and the summary open from Today on phones. */}
+            <Link to="/plan" className="inline-flex min-h-11 items-center text-[13px] font-bold">
+              Plan &amp; appointments
+            </Link>
+            <Link to="/summary" className="inline-flex min-h-11 items-center text-[13px] font-bold">
+              Daily summary
+            </Link>
+          </span>
         }
       >
         Up next
