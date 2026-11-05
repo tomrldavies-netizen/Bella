@@ -7,6 +7,7 @@ import { EditMedicines } from './screens/plan/EditMedicines'
 import { EditRoutines } from './screens/plan/EditRoutines'
 import { Expressing } from './screens/Expressing'
 import { Family } from './screens/Family'
+import { ReminderKeys } from './screens/ReminderKeys'
 import { Feeds } from './screens/Feeds'
 import { Meds } from './screens/Meds'
 import { Care } from './screens/Care'
@@ -33,6 +34,7 @@ export const appRoutes: RouteObject[] = [
       { path: 'bellas-plan/exercises', element: <EditExercises /> },
       { path: 'bellas-plan/routines', element: <EditRoutines /> },
       { path: 'bellas-plan/family', element: <Family /> },
+      { path: 'bellas-plan/family/reminder-keys', element: <ReminderKeys /> },
       { path: '*', element: <Navigate to="/" replace /> },
     ],
   },

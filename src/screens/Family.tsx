@@ -10,6 +10,7 @@ import type { Member, Role } from '../data/types'
 import { cancelInvite, createInvite, inviteMessage, loadPendingInvites, resendInvite, updateMember, updateMyProfile, type Invite } from '../family/api'
 import { INSTALL_STEPS, detectPlatform } from '../family/install'
 import { useHousehold, useReadyHousehold } from '../household/HouseholdContext'
+import { RemindersCard } from '../reminders/RemindersCard'
 import { useLiveQuery } from '../lib/useLiveQuery'
 import { useNow } from '../lib/useNow'
 import { shortDate, ukParts } from '../lib/ukTime'
@@ -348,7 +349,7 @@ export function Family() {
                   {m.display_name}
                   {m.id === me.id ? ' (you)' : ''}
                 </span>
-                <span className="text-xs text-ink-muted">Alerts arrive in a later update</span>
+                <span className="text-xs text-ink-muted">{m.id === me.id ? 'Tap to change your name and colour' : ROLE_LABEL[m.role]}</span>
               </span>
               <span className={`rounded-full px-2.5 py-1 text-xs font-extrabold ${m.role === 'parent' ? 'bg-primary-tint text-primary' : 'bg-tabs text-ink-deep'}`}>{ROLE_LABEL[m.role]}</span>
             </button>
@@ -393,6 +394,8 @@ export function Family() {
             <span className="text-[13px] leading-snug">See everything<br />Log feeds, nappies, meds<br />Not change doses or plan</span>
           </Card>
         </div>
+
+        <RemindersCard />
 
         <h2 className="m-0 pt-1 text-xl font-bold">Getting the app on their phone</h2>
         <InstallSteps />

@@ -10,6 +10,8 @@ export type Member = {
   active: boolean
   /** When they joined (used so old plan changes aren't shown as new). */
   created_at?: string
+  /** Their reminder choices (types, lead times, quiet hours). */
+  reminder_settings?: Record<string, unknown>
 }
 
 export type Household = {

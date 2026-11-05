@@ -16,7 +16,7 @@ function ScrollToTop() {
 export function AppShell() {
   // Plan edit screens have their own bottom bar (Tell everyone + Save) instead of the tabs.
   const { pathname } = useLocation()
-  const editing = pathname.startsWith('/bellas-plan/') && pathname !== '/bellas-plan/family'
+  const editing = pathname.startsWith('/bellas-plan/') && !pathname.startsWith('/bellas-plan/family')
   return (
     <div className="min-h-dvh md:flex">
       <ScrollToTop />
