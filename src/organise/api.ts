@@ -1,4 +1,6 @@
 import { supabase } from '../lib/supabase'
+import { friendlyError } from '../offline/network'
+import { newId, runOrQueue } from '../offline/outbox'
 import type { Appointment, CareTaskLog, ExpressingSession, Milestone, PlanChangeSeen, Prescription, Question, Supply } from './types'
 
 function db() {
@@ -7,7 +9,7 @@ function db() {
 }
 
 function check<T>(res: { data: T | null; error: { message: string } | null }): T {
-  if (res.error) throw new Error(res.error.message)
+  if (res.error) throw new Error(friendlyError(res.error.message))
   return res.data as T
 }
 
@@ -29,7 +31,7 @@ export const updateAppointment = (id: string, row: Partial<Omit<Appointment, 'id
 export const deleteAppointment = (id: string) => remove('appointments', id)
 
 export const loadQuestions = (h: string) => list<Question>('questions', h, 'logged_at', false)
-export const addQuestion = (h: string, text: string, appointmentId: string | null) => insert('questions', h, { text, appointment_id: appointmentId })
+export const addQuestion = (h: string, text: string, appointmentId: string | null) => queuedInsert('questions', h, { text, appointment_id: appointmentId })
 export const updateQuestion = (id: string, patch: Partial<Pick<Question, 'text' | 'appointment_id' | 'answered' | 'answer'>>) => update('questions', id, patch)
 export const deleteQuestion = (id: string) => remove('questions', id)
 
@@ -40,7 +42,10 @@ export const updateSupply = (id: string, patch: Partial<Omit<Supply, 'id' | 'qua
 export const deleteSupply = (id: string) => remove('supplies', id)
 /** Anyone in the household may change the count (agreed with the parents). */
 export async function setSupplyQuantity(id: string, quantity: number) {
-  check(await db().rpc('set_supply_quantity', { p_supply_id: id, p_quantity: quantity }))
+  const args = { p_supply_id: id, p_quantity: quantity }
+  await runOrQueue({ id: newId(), at: new Date().toISOString(), kind: 'rpc', fn: 'set_supply_quantity', args }, async () =>
+    check(await db().rpc('set_supply_quantity', args)),
+  )
 }
 /** Offered the first time: counts start at 0 until the parents enter real ones. */
 export const DEFAULT_SUPPLIES = ['NG tubes', 'Syringes', 'Tube tape', 'Fortifier']
@@ -48,8 +53,23 @@ export const DEFAULT_SUPPLIES = ['NG tubes', 'Syringes', 'Tube tape', 'Fortifier
 // ------------------------------------------------------------------ care tasks
 export const loadCareTaskLogs = (h: string) =>
   list<CareTaskLog>('care_task_logs', h, 'logged_at', false, (q) => q.gte('logged_at', new Date(Date.now() - 90 * 86_400_000).toISOString()))
-export const tickCareTask = (h: string, taskId: string) => insert('care_task_logs', h, { care_task_id: taskId })
-export const untickCareTask = (id: string) => remove('care_task_logs', id)
+/** Works offline too: kept on the phone and sent when there's signal. */
+async function queuedInsert(table: string, h: string, row: object): Promise<string> {
+  const id = newId()
+  const full = { id, household_id: h, logged_at: new Date().toISOString(), ...row }
+  await runOrQueue({ id, at: new Date().toISOString(), kind: 'insert', table, row: full }, async () => {
+    const { error } = await db().from(table).insert(full)
+    if (error && error.code !== '23505') throw new Error(friendlyError(error.message))
+  })
+  return id
+}
+const queuedUpdate = (table: string, id: string, patch: object) =>
+  runOrQueue({ id: newId(), at: new Date().toISOString(), kind: 'update', table, rowId: id, patch: patch as Record<string, unknown> }, () => update(table, id, patch)).then(() => {})
+const queuedDelete = (table: string, id: string) =>
+  runOrQueue({ id: newId(), at: new Date().toISOString(), kind: 'delete', table, rowId: id }, () => remove(table, id)).then(() => {})
+
+export const tickCareTask = (h: string, taskId: string) => queuedInsert('care_task_logs', h, { care_task_id: taskId })
+export const untickCareTask = (id: string) => queuedDelete('care_task_logs', id)
 
 // ------------------------------------------------------------------ prescriptions
 export const loadPrescriptions = async (h: string) =>
@@ -67,8 +87,8 @@ export const loadExpressing = async (h: string) =>
     left_ml: Number(s.left_ml),
     right_ml: Number(s.right_ml),
   }))
-export const addExpressing = (h: string, row: Omit<ExpressingSession, 'id' | 'logged_by' | 'used_at'>) => insert('expressing_sessions', h, row)
-export const updateExpressing = (id: string, patch: Partial<Omit<ExpressingSession, 'id' | 'logged_by'>>) => update('expressing_sessions', id, patch)
+export const addExpressing = (h: string, row: Omit<ExpressingSession, 'id' | 'logged_by' | 'used_at'>) => queuedInsert('expressing_sessions', h, row)
+export const updateExpressing = (id: string, patch: Partial<Omit<ExpressingSession, 'id' | 'logged_by'>>) => queuedUpdate('expressing_sessions', id, patch)
 export const deleteExpressing = (id: string) => remove('expressing_sessions', id)
 
 // ------------------------------------------------------------------ firsts (with private photos)

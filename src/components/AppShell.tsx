@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { InstallHelp } from '../family/InstallHelp'
+import { OfflineBar } from './OfflineBar'
 import { BottomTabs } from './BottomTabs'
 import { SideRail } from './SideRail'
 
@@ -22,6 +23,7 @@ export function AppShell() {
       <ScrollToTop />
       <SideRail className="hidden md:flex" />
       <main className={`min-w-0 flex-1 md:pb-8 ${editing ? '' : 'pb-[calc(92px+env(safe-area-inset-bottom))]'}`}>
+        <OfflineBar />
         <Outlet />
       </main>
       {!editing && <BottomTabs className="md:hidden" />}

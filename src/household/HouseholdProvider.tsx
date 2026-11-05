@@ -3,6 +3,8 @@ import { useAuth } from '../auth/AuthContext'
 import type { Baby, Household, Member, NewHousehold } from '../data/types'
 import { supabase } from '../lib/supabase'
 import { useRealtime } from '../lib/useRealtime'
+import { readCache, writeCache } from '../offline/cache'
+import { isNetworkError } from '../offline/network'
 import { HouseholdContext, type HouseholdApi, type HouseholdState } from './HouseholdContext'
 
 const LIVE_TABLES = ['households', 'members', 'babies'] as const
@@ -47,7 +49,17 @@ export function HouseholdProvider({ children }: { children: ReactNode }) {
 
   const reload = useCallback(() => {
     if (!userId) return
-    loadHousehold(userId).then((s) => setLoaded({ userId, state: s }))
+    loadHousehold(userId)
+      .then((s) => {
+        // A lost connection: open with the copy kept on this phone, if there is one.
+        if (s.status === 'error' && isNetworkError(s.message)) {
+          const cached = readCache<HouseholdState>(`household.${userId}`)
+          if (cached) return setLoaded((prev) => (prev?.userId === userId && prev.state.status === 'ready' ? prev : { userId, state: cached }))
+        }
+        if (s.status === 'ready') writeCache(`household.${userId}`, s)
+        setLoaded({ userId, state: s })
+      })
+      .catch((e: unknown) => setLoaded({ userId, state: { status: 'error', message: e instanceof Error ? e.message : String(e) } }))
   }, [userId])
 
   useEffect(() => {

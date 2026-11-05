@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { offlineAwareFetch } from '../offline/network'
 
 /**
  * Just the project address (https://abcd.supabase.co), even if the secret was
@@ -32,5 +33,7 @@ export const supabase: SupabaseClient | null =
           persistSession: true,
           autoRefreshToken: true,
         },
+        // A lost connection reads "You're offline…" rather than "Failed to fetch".
+        global: { fetch: offlineAwareFetch },
       })
     : null

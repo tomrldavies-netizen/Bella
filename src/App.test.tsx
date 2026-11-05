@@ -27,7 +27,7 @@ describe('app shell', () => {
     renderAt('/')
     const [rail] = screen.getAllByRole('navigation', { name: 'Main' })
     await userEvent.click(within(rail).getByRole('link', { name: 'Feeds' }))
-    expect(screen.getByRole('heading', { level: 1, name: 'Feeds' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Feeds' })).toBeInTheDocument()
     expect(within(rail).getByRole('link', { name: 'Feeds' })).toHaveAttribute('aria-current', 'page')
   })
 
@@ -38,9 +38,9 @@ describe('app shell', () => {
     ['/plan', 'Plan'],
     ['/summary', 'Daily summary'],
     ['/bellas-plan', "Bella's plan"],
-  ])('opens %s', (path, title) => {
+  ])('opens %s', async (path, title) => {
     renderAt(path)
-    expect(screen.getByRole('heading', { level: 1, name: title })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: title })).toBeInTheDocument()
   })
 
   it('sends unknown routes to Today', () => {
@@ -101,7 +101,7 @@ describe('household details', () => {
   it('signs out from Bella\'s plan', async () => {
     const auth = fakeAuth()
     renderRoutes('/bellas-plan', { auth })
-    await userEvent.click(screen.getByRole('button', { name: 'Sign out' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Sign out' }))
     expect(auth.signOut).toHaveBeenCalled()
   })
 })

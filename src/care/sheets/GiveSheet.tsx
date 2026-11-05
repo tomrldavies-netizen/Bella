@@ -9,6 +9,7 @@ import { DOSE_FINE_STEP, DOSE_STEP, formatDose } from '../../plan/medicines'
 
 const ROUTE_WORDS = { mouth: 'by mouth', tube: 'via tube', either: 'by mouth or via tube' } as const
 import { AlreadyGiven, giveMedicine } from '../api'
+import { useOutbox } from '../../offline/outbox'
 import type { DoseSlot } from '../medSchedule'
 import type { GivenLog } from '../types'
 
@@ -33,6 +34,7 @@ export function GiveSheet({
   onClose: () => void
 }) {
   const nameOf = (id: string) => members.find((m) => m.id === id)?.display_name ?? 'Someone'
+  const { online } = useOutbox()
   const first = already[0]
   const [conflict, setConflict] = useState<{ by: string; at: string } | null>(
     first ? { by: nameOf(first.logged_by), at: first.given_at } : null,
@@ -51,7 +53,7 @@ export function GiveSheet({
     setBusy(true)
     setError(null)
     try {
-      await giveMedicine({ householdId, medicineId: slot.medicineId, scheduledFor: slot.scheduledFor, givenAt, dose, allowRepeat })
+      await giveMedicine({ householdId, medicineId: slot.medicineId, scheduledFor: slot.scheduledFor, givenAt, dose, allowRepeat, label: `${slot.name} ${slot.time}` })
       onDone()
     } catch (e) {
       setBusy(false)
@@ -93,6 +95,11 @@ export function GiveSheet({
         </div>
       )}
 
+      {!online && (
+        <p role="alert" className="m-0 rounded-2xl border-[1.5px] border-meds-accent bg-meds px-3 py-2.5 text-sm font-bold">
+          You're offline. This will be saved on this phone and synced when there's signal. Someone else may also have given this dose; if so, you'll be told when it syncs.
+        </p>
+      )}
       {!blocked && (
         <>
           <div className="flex items-center justify-between gap-2">

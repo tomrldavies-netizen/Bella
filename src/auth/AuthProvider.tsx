@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
 import { AuthContext, type AuthApi } from './AuthContext'
 import { friendly } from './friendly'
+import { clearCache } from '../offline/cache'
+import { outbox } from '../offline/outbox'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
@@ -41,6 +43,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return error ? friendly(error.message, 'verify') : null
       },
       async signOut() {
+        // Forget everything kept on this phone for offline use, including unsynced
+        // changes (they'd otherwise be saved under the next person's name).
+        clearCache()
+        outbox.reset()
         await supabase?.auth.signOut()
       },
     }),

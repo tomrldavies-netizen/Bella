@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase'
+import { friendlyError } from '../offline/network'
 
 function db() {
   if (!supabase) throw new Error('Not connected')
@@ -6,7 +7,7 @@ function db() {
 }
 
 function check<T>(res: { data: T | null; error: { message: string } | null }): T {
-  if (res.error) throw new Error(res.error.message)
+  if (res.error) throw new Error(friendlyError(res.error.message))
   return res.data as T
 }
 

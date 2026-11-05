@@ -218,12 +218,13 @@ function Timeline({ items, loading, onOpen }: { items: TimelineItem[]; loading: 
               key={i.key}
               type="button"
               onClick={() => onOpen(i)}
-              aria-label={`${i.time} ${i.text}${who ? `, ${who.display_name}` : ''}. Tap to edit`}
+              aria-label={`${i.time} ${i.text}${who ? `, ${who.display_name}` : ''}${i.pending ? ', waiting to sync' : ''}. Tap to edit`}
               className="flex min-h-[46px] items-center gap-2.5 border-b border-line-soft py-1.5 text-left last:border-b-0 md:min-h-12 md:gap-3.5"
             >
               <span className="w-[42px] shrink-0 text-[13px] font-extrabold md:w-[50px] md:text-sm">{i.time}</span>
               <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: i.colour }} />
               <span className={`min-w-0 flex-1 text-sm md:text-[15px] ${i.flagged ? 'font-bold text-alert' : ''}`}>{i.text}</span>
+              {i.pending && <span className="shrink-0 text-[11px] font-bold text-ink-muted">waiting to sync</span>}
               {who && <NamePill member={who} className="shrink-0 !px-2 !py-[3px]" />}
             </button>
           )

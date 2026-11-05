@@ -1,4 +1,6 @@
 import { supabase } from '../lib/supabase'
+import { friendlyError } from '../offline/network'
+import { newId, runOrQueue } from '../offline/outbox'
 import type { ExerciseLog, FeedLog, GivenLog, NappyLog, NoteLog, ObsLog, TubeChange, TummyLog, WeightLog } from './types'
 
 function db() {
@@ -7,7 +9,7 @@ function db() {
 }
 
 function check<T>(res: { data: T | null; error: { message: string; details?: string | null } | null }): T {
-  if (res.error) throw Object.assign(new Error(res.error.message), { details: res.error.details ?? null })
+  if (res.error) throw Object.assign(new Error(friendlyError(res.error.message)), { details: res.error.details ?? null })
   return res.data as T
 }
 
@@ -85,16 +87,29 @@ export async function loadGivenBetween(householdId: string, fromIso: string, toI
   ).map((g) => num(g, ['dose_given']))
 }
 
+/**
+ * Saves a log entry, or keeps it on the phone to send when there's signal.
+ * The id is made here so a queued entry can be shown, edited or deleted straight away.
+ */
 export async function addLog<T extends object>(table: LogTable, householdId: string, row: T): Promise<string> {
-  return check<{ id: string }>(await db().from(table).insert({ household_id: householdId, ...row }).select('id').single()).id
+  const id = newId()
+  const full = { id, household_id: householdId, logged_at: new Date().toISOString(), ...row }
+  const op = { id, at: new Date().toISOString(), kind: 'insert' as const, table, row: full }
+  await runOrQueue(op, async () => {
+    const { error } = await db().from(table).insert(full)
+    if (error && error.code !== '23505') throw new Error(friendlyError(error.message))
+  })
+  return id
 }
 
 export async function updateLog<T extends object>(table: LogTable, id: string, patch: T): Promise<void> {
-  check(await db().from(table).update(patch).eq('id', id))
+  const op = { id: newId(), at: new Date().toISOString(), kind: 'update' as const, table, rowId: id, patch: patch as Record<string, unknown> }
+  await runOrQueue(op, async () => void check(await db().from(table).update(patch).eq('id', id)))
 }
 
 export async function deleteLog(table: LogTable, id: string): Promise<void> {
-  check(await db().from(table).delete().eq('id', id))
+  const op = { id: newId(), at: new Date().toISOString(), kind: 'delete' as const, table, rowId: id }
+  await runOrQueue(op, async () => void check(await db().from(table).delete().eq('id', id)))
 }
 
 export class AlreadyGiven extends Error {
@@ -107,7 +122,11 @@ export class AlreadyGiven extends Error {
   }
 }
 
-/** Marks a dose given. Throws AlreadyGiven (with who and when) unless allowRepeat. */
+/**
+ * Marks a dose given. Online: throws AlreadyGiven (with who and when) unless allowRepeat.
+ * Offline: kept on the phone; when it syncs, a dose someone else also gave is still
+ * recorded and flagged (agreed with the parents). Resolves to "queued" when offline.
+ */
 export async function giveMedicine(args: {
   householdId: string
   medicineId: string
@@ -115,18 +134,24 @@ export async function giveMedicine(args: {
   givenAt: string
   dose: number
   allowRepeat: boolean
-}): Promise<string> {
-  const res = await db().rpc('give_medicine', {
+  /** e.g. "Iron 23:00", for the "also given by" message after an offline sync. */
+  label?: string
+}): Promise<'saved' | 'queued'> {
+  const params = {
     p_household: args.householdId,
     p_medicine_id: args.medicineId,
     p_scheduled_for: args.scheduledFor,
     p_given_at: args.givenAt,
     p_dose_given: args.dose,
-    p_allow_repeat: args.allowRepeat,
-  })
-  if (res.error?.message === 'ALREADY_GIVEN') {
-    const d = JSON.parse(res.error.details ?? '{}') as { by?: string; at?: string }
-    throw new AlreadyGiven(d.by ?? 'Someone', d.at ?? '')
   }
-  return check<string>(res)
+  const id = newId()
+  const queued = await runOrQueue({ id, at: new Date().toISOString(), kind: 'give', args: params, label: args.label ?? 'A dose', rowId: id }, async () => {
+    const res = await db().rpc('give_medicine', { ...params, p_allow_repeat: args.allowRepeat })
+    if (res.error?.message === 'ALREADY_GIVEN') {
+      const d = JSON.parse(res.error.details ?? '{}') as { by?: string; at?: string }
+      throw new AlreadyGiven(d.by ?? 'Someone', d.at ?? '')
+    }
+    check(res)
+  })
+  return queued ? 'queued' : 'saved'
 }

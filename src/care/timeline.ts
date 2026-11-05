@@ -25,6 +25,8 @@ export type TimelineItem = {
   colour: string
   /** Something non-routine worth noticing (e.g. a large sick). */
   flagged: boolean
+  /** Saved on this phone, waiting for signal to sync. */
+  pending: boolean
 }
 
 export const DOT = { feed: '#7FA9C1', nappy: '#A994C4', given: '#E9A06B', note: '#D9B45A', tube: '#6FA89F', obs: '#8DB596', exercise: '#B5677D', speech: '#6FA89F', tummy: '#D98CA0' } as const
@@ -70,6 +72,7 @@ export function buildTimeline(logs: DayLogs, medicines: Medicine[], exercises: E
     at: i.entry.row.logged_at,
     time: ukParts(i.entry.row.logged_at).time,
     by: i.entry.row.logged_by,
+    pending: !!(i.entry.row as { _pending?: boolean })._pending,
   }))
   return items.sort((a, b) => b.at.localeCompare(a.at))
 }

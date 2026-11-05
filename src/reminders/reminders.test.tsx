@@ -27,13 +27,15 @@ describe('Reminders card', () => {
     expect(await screen.findByText('Sent to 1 phone')).toBeInTheDocument()
   })
 
-  it('parents start with everything on; helpers with plan changes only', async () => {
+  it('parents start with everything on', async () => {
     renderRoutes('/bellas-plan/family')
     expect(await screen.findByRole('switch', { name: 'Medicines due' })).toHaveAttribute('aria-checked', 'true')
+  })
+
+  it('helpers start with plan changes only', async () => {
     renderRoutes('/bellas-plan/family', { household: helperHousehold() })
-    const meds = await screen.findAllByRole('switch', { name: 'Medicines due' })
-    expect(meds[1]).toHaveAttribute('aria-checked', 'false')
-    expect((await screen.findAllByRole('switch', { name: "Bella's plan has changed" }))[1]).toHaveAttribute('aria-checked', 'true')
+    expect(await screen.findByRole('switch', { name: 'Medicines due' })).toHaveAttribute('aria-checked', 'false')
+    expect(screen.getByRole('switch', { name: "Bella's plan has changed" })).toHaveAttribute('aria-checked', 'true')
   })
 
   it('saves types, lead time and quiet hours', async () => {

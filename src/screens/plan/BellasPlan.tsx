@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Elephant, Hornbill, LionCub, Meerkat, Monkey, Zebra } from '../../animals'
 import { useAuth } from '../../auth/AuthContext'
+import { useOutbox } from '../../offline/outbox'
 import { Card, EmptyNote } from '../../components/Card'
 import { ErrorNote } from '../../components/Field'
 import { ChevronIcon, ClipboardIcon } from '../../components/Icons'
@@ -37,15 +38,22 @@ function SectionLink({ to, icon, title, summary }: { to: string; icon: ReactNode
 function SignedInCard() {
   const { me } = useReadyHousehold()
   const { session, signOut } = useAuth()
+  const { ops } = useOutbox()
+  const [confirm, setConfirm] = useState(false)
   return (
     <Card className="flex flex-wrap items-center gap-3 px-4 py-3">
       <NamePill member={me} />
       <span className="min-w-0 flex-1 text-sm text-ink-muted">
         Signed in as {session?.user.email} · {me.role === 'parent' ? 'Parent' : 'Helper'}
       </span>
+      {confirm && (
+        <p role="alert" className="m-0 w-full rounded-xl bg-meds px-3 py-2 text-sm font-bold text-alert">
+          {ops.length} change{ops.length === 1 ? " hasn't" : "s haven't"} synced yet and will be lost if you sign out now. Wait for signal, or tap Sign out again.
+        </p>
+      )}
       <button
         type="button"
-        onClick={signOut}
+        onClick={() => (ops.length && !confirm ? setConfirm(true) : signOut())}
         className="min-h-11 rounded-full border-[1.5px] border-line bg-card px-4 text-sm font-extrabold text-ink"
       >
         Sign out

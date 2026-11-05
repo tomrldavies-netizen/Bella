@@ -72,7 +72,7 @@ describe('Care', () => {
   it('saves obs, starting from the last temperature', async () => {
     renderRoutes('/care')
     const temp = await screen.findByRole('group', { name: 'Temperature' })
-    expect(within(temp).getByText('36.8 °C')).toBeInTheDocument()
+    expect(await within(temp).findByText('36.8 °C')).toBeInTheDocument()
     await user.click(within(temp).getByRole('button', { name: /0.1 °C more/ }))
     await user.click(screen.getByRole('radio', { name: 'Noisy' }))
     expect(screen.getByText('This will be highlighted: noisy breathing.')).toBeInTheDocument()
@@ -130,7 +130,8 @@ describe('Today with care', () => {
 describe('Growth', () => {
   it('shows ages, weight gain and weigh-ins', async () => {
     renderRoutes('/growth')
-    expect(await screen.findByText('7 wks 2 d')).toBeInTheDocument()
+    expect(await screen.findByText('+165 g this week')).toBeInTheDocument()
+    expect(screen.getByText('7 wks 2 d')).toBeInTheDocument()
     expect(screen.getByText('38+4 wks')).toBeInTheDocument()
     expect(screen.getByText('in 10 days')).toBeInTheDocument()
     expect(screen.getByText('2.31 kg')).toBeInTheDocument()
@@ -141,7 +142,8 @@ describe('Growth', () => {
 
   it('adds a weigh-in', async () => {
     renderRoutes('/growth')
-    await user.click(await screen.findByRole('button', { name: 'Add weigh-in' }))
+    await screen.findByText('+165 g this week')
+    await user.click(screen.getByRole('button', { name: 'Add weigh-in' }))
     await user.type(screen.getByLabelText('Weight (grams)'), '2405')
     expect(screen.getByText('2.41 kg · +95 g since last')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Save weigh-in' }))
