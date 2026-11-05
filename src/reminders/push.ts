@@ -1,3 +1,4 @@
+import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 
 export type PushState = 'unsupported' | 'needs-install' | 'blocked' | 'off' | 'on'
@@ -64,7 +65,7 @@ export async function turnOffPush(): Promise<void> {
 export async function sendTest(): Promise<string> {
   if (!supabase) throw new Error('Not connected')
   const { data, error } = await supabase.functions.invoke('send-reminders', { body: { test: true } })
-  if (error) throw new Error(error.message)
+  if (error) throw new Error(await explainFunctionError(error))
   const r = data as { sent?: number; error?: string }
   if (r.error) throw new Error(r.error)
   return `Sent to ${r.sent} phone${r.sent === 1 ? '' : 's'}`
@@ -82,4 +83,26 @@ export function clearNotificationsOnOpen() {
   const clear = () => document.visibilityState === 'visible' && navigator.serviceWorker.controller?.postMessage('clear-notifications')
   clear()
   document.addEventListener('visibilitychange', clear)
+}
+
+/** Plain-English reasons for the usual set-up problems with the send-reminders function. */
+export async function explainFunctionError(error: unknown): Promise<string> {
+  if (error instanceof FunctionsHttpError) {
+    const res = error.context as Response
+    let detail = ''
+    try {
+      const body = await res.clone().json()
+      detail = body.error ?? body.msg ?? body.message ?? ''
+    } catch {
+      detail = await res.text().catch(() => '')
+    }
+    if (res.status === 404) return 'The send-reminders function wasn’t found. Check it’s deployed with exactly that name.'
+    if (res.status === 401 && /jwt|authorization/i.test(detail) && !/Not allowed/.test(detail))
+      return 'The send-reminders function has “Enforce JWT verification” turned on. Turn it off in its settings.'
+    return `The reminders server said: ${detail || `error ${res.status}`}`
+  }
+  if (error instanceof FunctionsRelayError) return 'Supabase couldn’t start the send-reminders function. Check its Logs for a boot error.'
+  if (error instanceof FunctionsFetchError)
+    return 'Couldn’t reach the send-reminders function. Usually this means “Enforce JWT verification” is still on, it isn’t deployed with exactly that name, or it failed to start (see its Logs in Supabase).'
+  return error instanceof Error ? error.message : String(error)
 }

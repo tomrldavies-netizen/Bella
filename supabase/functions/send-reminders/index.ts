@@ -61,6 +61,10 @@ async function send(targets: Target[]) {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
+  // Self-check: open the function's URL in a browser. Shows which secrets are set (never their values).
+  if (req.method === 'GET') {
+    return json({ ok: true, vapidPublicKey: !!VAPID_PUBLIC, vapidPrivateKey: !!VAPID_PRIVATE, vapidSubject: !!Deno.env.get('VAPID_SUBJECT'), cronSecret: !!CRON_SECRET })
+  }
   if (!VAPID_PUBLIC || !VAPID_PRIVATE) return json({ error: 'VAPID keys are not set in Edge Function secrets' }, 500)
   webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC, VAPID_PRIVATE)
 

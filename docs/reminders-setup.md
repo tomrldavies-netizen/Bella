@@ -81,6 +81,13 @@ $$);
 `YOUR-PROJECT-REF` is the part of your Project URL before `.supabase.co`.
 </details>
 
+**Check the function itself:** open `https://YOUR-PROJECT-REF.supabase.co/functions/v1/send-reminders` in a browser
+(`YOUR-PROJECT-REF` is the part of your Project URL before `.supabase.co`). You should see
+`{"ok":true,"vapidPublicKey":true,"vapidPrivateKey":true,"vapidSubject":true,"cronSecret":true}`.
+- "Missing authorization header": "Enforce JWT verification" is still on. Turn it off.
+- "Requested function was not found": the function isn't named exactly `send-reminders`.
+- Any `false`: that secret is missing (step 4). Add it, then redeploy the function.
+
 **Check it's running:** Edge Functions → `send-reminders` → **Logs** or **Invocations** should show a call every minute, each with status 200.
 
 ## 7. Turn reminders on, on each phone
