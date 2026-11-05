@@ -137,6 +137,7 @@ Some phases add a new SQL file to `supabase/migrations/`. Run each one **once, i
 | 6 | [`20261107000000_phase6_family.sql`](https://github.com/tomrldavies-netizen/Bella/blob/main/supabase/migrations/20261107000000_phase6_family.sql) | Invites, joining, own name and colour, one household only |
 | 7 | [`20261108000000_phase7_plan_summary.sql`](https://github.com/tomrldavies-netizen/Bella/blob/main/supabase/migrations/20261108000000_phase7_plan_summary.sql) | Prescriptions, supply counts for helpers, freezer stock, private photo storage for Bella's firsts |
 | 8 | [`20261109000000_phase8_reminders.sql`](https://github.com/tomrldavies-netizen/Bella/blob/main/supabase/migrations/20261109000000_phase8_reminders.sql) | Push reminders. Then follow [`docs/reminders-setup.md`](reminders-setup.md) |
+| 9 | [`20261110000000_alarms.sql`](https://github.com/tomrldavies-netizen/Bella/blob/main/supabase/migrations/20261110000000_alarms.sql) | Alarm mode for feeds and medicines, work hours |
 
 After running the phase 7 file, check **Storage** in the Supabase sidebar: there should be a bucket called **firsts** marked **Private**. Don't make it public.
 

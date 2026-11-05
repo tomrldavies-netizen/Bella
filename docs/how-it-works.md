@@ -35,9 +35,21 @@ Helpers are in `src/lib/ukTime.ts` and `src/lib/age.ts`, and `app.uk()` in SQL.
 1. Supabase Cron calls the `send-reminders` Edge Function every minute (with the `x-cron-secret` header).
 2. It calls `reminder_run()` in the database, which works out what's due, records each reminder once in `reminders_sent`,
    and returns notifications per phone, respecting each person's settings (`members.reminder_settings`).
-   Quiet hours never silence medicines, and there's no follow-up for a late dose.
+   Quiet hours never silence medicines.
 3. The function sends them with Web Push (VAPID keys in Edge Function secrets). `src/sw.ts` shows them.
 4. When something is logged, its reminder is cleared. Anyone already notified gets a quiet "✓ done" replacement (same notification tag).
+5. **Alarm mode** (per phone, feeds and medicines only, `reminder_settings.alarm`). The first notice stays on screen
+   (`requireInteraction`) and has Snooze 5 min / Stop buttons where the phone supports them. From the due time it re-rings
+   every 2 minutes for up to 20 minutes until the item is logged, snoozed or stopped (`reminder_alarms` table,
+   `alarm_action()` and `my_alarms()` functions). With the app open, a full-screen alarm with sound shows instead.
+   During quiet hours or work hours (`reminder_settings.work`) alarms fall back to one ordinary notification.
+   iPhones can't vibrate from the web, show no action buttons, and silent mode mutes it: there it's a repeating notification.
+
+## Overdue
+
+`src/care/overdue.ts` works out what's past its time (planned feeds not logged, doses due or missed, obs, tube change,
+care tasks). Today shows them at the top: amber "Due now" from the due time, red "Overdue" once 15 minutes late,
+with how late and a button to log it. The tabs get a red dot and the home-screen icon a badge count where supported.
 
 ## Offline
 

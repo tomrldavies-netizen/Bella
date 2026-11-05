@@ -4,7 +4,8 @@ import { Elephant, Hippo, LionCub, Meerkat, Monkey, SavannaScene } from '../anim
 import { addLog, deleteLog } from '../care/api'
 import { countdown } from '../care/countdown'
 import { describePlanned, feedTotals, nextPlannedFeed, plannedDayTotal } from '../care/feedLog'
-import { doseStatus, dosesForDay, nextDose } from '../care/medSchedule'
+import { doseStatus, dosesForDay } from '../care/medSchedule'
+import { overdueItems, type OverdueItem } from '../care/overdue'
 import { EditEntrySheet, NappySheet, NoteSheet } from '../care/sheets/LogSheets'
 import { buildTimeline, type TimelineItem } from '../care/timeline'
 import { tubeStatus } from '../care/tube'
@@ -23,7 +24,7 @@ import { NamePill } from '../components/NamePill'
 import { useReadyHousehold } from '../household/HouseholdContext'
 import { actualAgeLabel, correctedAgeLabel, dueDateLabel, ukToday } from '../lib/age'
 import { formatLongDate, greeting } from '../lib/dates'
-import { formatNumber, ukParts } from '../lib/ukTime'
+import { addDaysIso, formatNumber, ukParts } from '../lib/ukTime'
 import { formatDose } from '../plan/medicines'
 
 // The pill stays small; the tap area around it is 44 px tall.
@@ -252,6 +253,44 @@ function Timeline({ items, loading, onOpen }: { items: TimelineItem[]; loading: 
   )
 }
 
+/**
+ * Everything due or late, at the top of Today: amber when just due, red from
+ * 15 minutes late, with how long ago and a button to log it.
+ */
+function OverduePanel({ items }: { items: OverdueItem[] }) {
+  if (items.length === 0) return null
+  const late = items.some((i) => i.severity === 'late')
+  return (
+    <section
+      aria-labelledby="overdue"
+      className={`flex flex-col gap-1 rounded-[18px] border-2 px-3.5 py-2.5 ${late ? 'border-alert bg-meds' : 'border-banner-accent bg-banner'}`}
+    >
+      <h2 id="overdue" className={`m-0 flex items-center gap-2 text-xl font-bold ${late ? 'text-alert' : ''}`}>
+        <span aria-hidden="true" className={`h-3 w-3 rounded-full ${late ? 'bg-alert motion-safe:animate-pulse' : 'bg-banner-accent'}`} />
+        {late ? `Overdue (${items.length})` : `Due now (${items.length})`}
+      </h2>
+      <ul className="m-0 flex list-none flex-col p-0">
+        {items.map((i) => (
+          <li key={i.key} className="flex min-h-[52px] items-center gap-3 border-b border-black/5 py-1.5 last:border-b-0">
+            <span className="flex min-w-0 flex-1 flex-col">
+              <span className="text-[15px] font-extrabold">
+                {i.title}{' '}
+                <span className={`rounded-full px-2 py-0.5 text-xs font-extrabold whitespace-nowrap ${i.severity === 'late' ? 'bg-alert text-white' : 'bg-banner-accent text-ink'}`}>
+                  {i.lateness === 'due now' ? 'due now' : i.kind === 'task' ? i.lateness : `${i.lateness.replace(' ago', '')} late`}
+                </span>
+              </span>
+              <span className="text-[13px] text-ink-deep">{i.detail}</span>
+            </span>
+            <Link to={i.to} className={`flex min-h-11 shrink-0 items-center rounded-full px-3.5 text-sm font-extrabold no-underline ${i.severity === 'late' ? 'bg-alert text-white hover:text-white' : 'bg-card text-ink hover:text-ink'}`}>
+              {i.action}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
 function Bar({ label, value, of, colour }: { label: string; value: string; of: number; colour: string }) {
   return (
     <div className="flex flex-col gap-1">
@@ -284,9 +323,11 @@ export function Today() {
   if (feed) {
     cards.push({ key: 'feed', to: '/feeds', tint: 'bg-feeds', icon: <Elephant size={30} />, label: 'NG feed', big: countdown(feed.at, t.now), detail: describePlanned(feed) })
   }
-  const dose = nextDose(meds, given, t.today, t.now)
+  // Up next shows what's coming; anything already due is in the Overdue panel above.
+  const dose = [...dosesForDay(meds, t.today), ...dosesForDay(meds, addDaysIso(t.today, 1))].find(
+    (d) => Date.parse(d.scheduledFor) > t.now.getTime() && doseStatus(d, given, t.now) !== 'given',
+  )
   if (dose) {
-    const overdue = Date.parse(dose.scheduledFor) < t.now.getTime()
     cards.push({
       key: 'med',
       to: '/meds',
@@ -295,12 +336,11 @@ export function Today() {
       label: dose.name,
       big: countdown(dose.scheduledFor, t.now),
       detail: `${dose.time} · ${formatDose(dose.dose, dose.unit)}`,
-      alert: overdue,
     })
   }
   const range = tempRangeOf(t.routines)
   const obsDue = obsDueAt(t.lastObs, t.routines?.obsIntervalMin ?? null, t.now)
-  if (obsDue && t.ready) {
+  if (obsDue && t.ready && (!t.lastObs || Date.parse(obsDue) > t.now.getTime())) {
     cards.push({
       key: 'obs',
       to: '/care',
@@ -309,20 +349,18 @@ export function Today() {
       label: 'Obs',
       big: t.lastObs ? countdown(obsDue, t.now) : 'Due',
       detail: t.lastObs ? `${ukParts(obsDue).time} · temp, breathing, sleep` : 'none logged yet',
-      alert: Date.parse(obsDue) < t.now.getTime(),
     })
   }
   const tube = tubeStatus(t.tube, t.routines?.tubeChangeDays ?? null, t.today)
-  if (tube?.intervalDays && tube.day >= tube.intervalDays) {
+  if (tube?.intervalDays && tube.day >= tube.intervalDays && !tube.due) {
     cards.push({
       key: 'tube',
       to: '/feeds',
       tint: 'bg-speech',
       icon: <Elephant size={30} />,
       label: 'NG tube change',
-      big: tube.due ? 'Due' : 'Tomorrow',
+      big: 'Tomorrow',
       detail: `${tube.nostril} nostril · day ${tube.day} of ${tube.intervalDays}`,
-      alert: tube.due,
     })
   }
 
@@ -390,6 +428,7 @@ export function Today() {
           <TabletHeader now={t.now} />
           {t.error && <ErrorNote>Couldn't load today: {t.error}</ErrorNote>}
           <PlanChangedBanner />
+          {t.ready && <OverduePanel items={overdueItems(t)} />}
           <UpNext cards={cards} loading={!t.ready} />
           <QuickLog onNappy={() => setSheet('nappy')} onNote={() => setSheet('note')} />
           <Timeline items={items} loading={!t.ready} onOpen={setSheet} />

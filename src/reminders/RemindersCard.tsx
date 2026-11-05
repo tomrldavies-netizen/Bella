@@ -7,7 +7,8 @@ import { fieldClass } from '../components/PlanEditLayout'
 import { Toggle } from '../components/Toggle'
 import { useHousehold, useReadyHousehold } from '../household/HouseholdContext'
 import { pushConfigured, pushState, saveReminderSettings, sendTest, turnOffPush, turnOnPush, type PushState } from './push'
-import { LEAD_TYPES, REMINDER_LABEL, REMINDER_TYPES, isOn, leadOf, type ReminderSettings } from './settings'
+import { ALARM_TYPES, LEAD_TYPES, REMINDER_LABEL, REMINDER_TYPES, isOn, leadOf, type ReminderSettings } from './settings'
+import { WEEKDAYS } from '../plan/routines'
 
 const STATE_TEXT: Record<PushState, string> = {
   unsupported: "This browser can't show reminders.",
@@ -50,6 +51,7 @@ export function RemindersCard() {
   const dirty = JSON.stringify(draft) !== JSON.stringify(saved)
   const setType = (type: (typeof REMINDER_TYPES)[number], on: boolean) => setDraft((d) => ({ ...d, types: { ...d.types, [type]: on } }))
   const quiet = draft.quiet ?? null
+  const work = draft.work ?? null
 
   return (
     <Card className="flex flex-col gap-3 px-4 py-3.5">
@@ -110,6 +112,15 @@ export function RemindersCard() {
         {REMINDER_TYPES.map((type) => (
           <div key={type} className="flex min-h-12 flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-line-soft py-1.5 last:border-b-0">
             <Toggle on={isOn(draft, me.role, type)} onChange={(on) => setType(type, on)} label={REMINDER_LABEL[type]} />
+            {(ALARM_TYPES as readonly string[]).includes(type) && isOn(draft, me.role, type) && (
+              <div className="w-full pl-12">
+                <Toggle
+                  on={!!draft.alarm?.[type as 'feed' | 'medicine']}
+                  onChange={(on) => setDraft((d) => ({ ...d, alarm: { ...d.alarm, [type]: on } }))}
+                  label="Alarm: repeat every 2 min for 20 min until logged"
+                />
+              </div>
+            )}
             {(LEAD_TYPES as readonly string[]).includes(type) && isOn(draft, me.role, type) && (
               <AmountStepper
                 label={`${REMINDER_LABEL[type]}: minutes before`}
@@ -139,6 +150,38 @@ export function RemindersCard() {
             <span className="text-xs text-ink-muted">Medicines still come through. Whoever is on nights can leave quiet hours off.</span>
           </>
         )}
+      </div>
+
+      <div className="flex flex-col gap-2 rounded-2xl border-[1.5px] border-line px-3 py-2.5">
+        <Toggle on={!!work} onChange={(on) => setDraft((d) => ({ ...d, work: on ? { days: [1, 2, 3, 4, 5], start: '09:00', end: '17:30' } : null }))} label="Work hours" />
+        {work && (
+          <>
+            <div role="group" aria-label="Work days" className="grid grid-cols-7 gap-1">
+              {WEEKDAYS.map((d, k) => {
+                const day = k + 1
+                const on = work.days.includes(day)
+                return (
+                  <button
+                    key={d}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => setDraft((x) => ({ ...x, work: { ...work, days: on ? work.days.filter((n) => n !== day) : [...work.days, day].sort() } }))}
+                    className={`h-11 rounded-xl border-[1.5px] text-xs font-extrabold ${on ? 'border-primary bg-primary-tint' : 'border-line bg-card text-ink-deep'}`}
+                  >
+                    {d}
+                  </button>
+                )
+              })}
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <span>From</span>
+              <input type="time" aria-label="Work hours start" value={work.start} onChange={(e) => e.target.value && setDraft((d) => ({ ...d, work: { ...work, start: e.target.value } }))} className={`${fieldClass} !w-28`} />
+              <span>to</span>
+              <input type="time" aria-label="Work hours end" value={work.end} onChange={(e) => e.target.value && setDraft((d) => ({ ...d, work: { ...work, end: e.target.value } }))} className={`${fieldClass} !w-28`} />
+            </div>
+          </>
+        )}
+        <span className="text-xs text-ink-muted">During quiet hours and work hours, alarms become ordinary notifications (no repeats). Medicine notifications always come through.</span>
       </div>
 
       {error && <ErrorNote>{error}</ErrorNote>}

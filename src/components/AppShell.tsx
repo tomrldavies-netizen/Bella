@@ -2,6 +2,14 @@ import { useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { InstallHelp } from '../family/InstallHelp'
 import { OfflineBar } from './OfflineBar'
+import { TodayProvider } from '../care/useToday'
+import { AlarmScreen } from '../reminders/AlarmScreen'
+import { useOverdueBadge } from '../care/useOverdue'
+
+function OverdueBadge() {
+  useOverdueBadge()
+  return null
+}
 import { BottomTabs } from './BottomTabs'
 import { SideRail } from './SideRail'
 
@@ -19,6 +27,7 @@ export function AppShell() {
   const { pathname } = useLocation()
   const editing = pathname.startsWith('/bellas-plan/') && !pathname.startsWith('/bellas-plan/family')
   return (
+    <TodayProvider>
     <div className="min-h-dvh md:flex">
       <ScrollToTop />
       <SideRail className="hidden md:flex" />
@@ -28,6 +37,9 @@ export function AppShell() {
       </main>
       {!editing && <BottomTabs className="md:hidden" />}
       <InstallHelp />
+      <AlarmScreen />
+      <OverdueBadge />
     </div>
+    </TodayProvider>
   )
 }

@@ -113,5 +113,7 @@ describe('countdown', () => {
     ['2026-12-04T14:00:00Z', '2 hrs'],
     ['2026-12-04T11:50:00Z', '10 min ago'],
     ['2026-12-04T12:00:10Z', 'Now'],
+    ['2026-12-03T08:20:00Z', '1 day 3 hr ago'],
+    ['2026-12-02T12:00:00Z', '2 days ago'],
   ])('%s → %s', (t, expected) => expect(countdown(t, now)).toBe(expected))
 })

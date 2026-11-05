@@ -4,6 +4,7 @@ import { useReadyHousehold } from '../household/HouseholdContext'
 import { correctedAgeLabel, ukToday } from '../lib/age'
 import { NAV_ITEMS, activeNavPath } from '../navigation'
 import { NamePill } from './NamePill'
+import { useOverdue } from '../care/useOverdue'
 
 const SYNC_LABEL = { live: 'synced', connecting: 'connecting…', offline: 'offline' } as const
 
@@ -15,6 +16,7 @@ export function SideRail({ className = '' }: { className?: string }) {
   const { pathname } = useLocation()
   const active = activeNavPath(pathname, 'rail')
   const { baby, members, sync } = useReadyHousehold()
+  const { lateByTab } = useOverdue()
   return (
     <nav
       aria-label="Main"
@@ -46,8 +48,12 @@ export function SideRail({ className = '' }: { className?: string }) {
                     : 'font-bold text-ink-deep hover:bg-card/50 hover:text-ink'
                 }`}
               >
-                <Icon size={22} className="shrink-0" />
+                <span className="relative shrink-0">
+                  <Icon size={22} />
+                  {lateByTab[path] ? <span aria-hidden="true" className="absolute -top-0.5 -right-1 h-2.5 w-2.5 rounded-full border-2 border-rail bg-alert" /> : null}
+                </span>
                 {railLabel}
+                {lateByTab[path] ? <span className="sr-only">, {lateByTab[path]} overdue</span> : null}
               </Link>
             </li>
           )

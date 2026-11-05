@@ -1,3 +1,4 @@
+import { createContext, createElement, useContext, type ReactNode } from 'react'
 import { useReadyHousehold } from '../household/HouseholdContext'
 import { useLiveQuery } from '../lib/useLiveQuery'
 import { useNow } from '../lib/useNow'
@@ -14,7 +15,7 @@ const LOG_TABLES = ['feeds', 'nappies', 'medicine_given', 'notes', 'tube_changes
  * Everything the care screens need for today (UK midnight to midnight),
  * kept live across devices. Rolls over at midnight.
  */
-export function useToday() {
+function useTodayData() {
   const { household, members, me } = useReadyHousehold()
   const now = useNow(30_000)
   const today = ukNow(now).date
@@ -72,4 +73,20 @@ export function useToday() {
       careTaskLogs.reload()
     },
   }
+}
+
+export type TodayData = ReturnType<typeof useTodayData>
+
+const TodayContext = createContext<TodayData | null>(null)
+
+/** Loads today once for the whole app (screens, overdue dots, alarm screen share it). */
+export function TodayProvider({ children }: { children: ReactNode }) {
+  const data = useTodayData()
+  return createElement(TodayContext.Provider, { value: data }, children)
+}
+
+export function useToday(): TodayData {
+  const ctx = useContext(TodayContext)
+  if (!ctx) throw new Error('useToday must be used inside <TodayProvider>')
+  return ctx
 }
