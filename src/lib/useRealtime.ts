@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from './supabase'
 
+/** Each hook gets its own channel: Supabase reuses a channel with the same name, even one already subscribed. */
+let channelSeq = 0
+
 export type SyncStatus = 'connecting' | 'live' | 'offline'
 
 /**
@@ -23,7 +26,7 @@ export function useRealtime(
   useEffect(() => {
     if (!supabase || !householdId) return
     const client = supabase
-    const channel = client.channel(`household:${householdId}:${key}`)
+    const channel = client.channel(`household:${householdId}:${key}:${++channelSeq}`)
     for (const table of key.split(',')) {
       const filter = table === 'households' ? `id=eq.${householdId}` : `household_id=eq.${householdId}`
       channel.on('postgres_changes', { event: '*', schema: 'public', table, filter }, () =>
