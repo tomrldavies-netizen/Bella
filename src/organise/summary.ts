@@ -2,6 +2,7 @@ import type { DayLogs } from '../care/api'
 import { feedTotals, plannedDayTotal } from '../care/feedLog'
 import { doseStatus, dosesForDay } from '../care/medSchedule'
 import { obsConcerns, type TempRange } from '../care/obs'
+import { countSuctions } from '../care/suction'
 import type { GivenLog, WeightLog } from '../care/types'
 import { ukParts } from '../lib/ukTime'
 import type { FeedPlanVersion, Medicine } from '../plan/api'
@@ -28,6 +29,7 @@ export function daySummary(args: {
   const temps = logs.obs.map((o) => o.temperature_c).filter((t): t is number => t !== null)
   const flagged = logs.obs.filter((o) => obsConcerns(o, range).length > 0).length
   const lastNappy = [...logs.nappies].sort((a, b) => b.logged_at.localeCompare(a.logged_at))[0]
+  const suctions = [...logs.suctions].sort((a, b) => a.logged_at.localeCompare(b.logged_at))
   const bars: FeedBar[] = [...logs.feeds]
     .sort((a, b) => a.logged_at.localeCompare(b.logged_at))
     .map((f) => {
@@ -46,6 +48,7 @@ export function daySummary(args: {
       large: sick.filter((f) => f.sick_level === 'large').length,
     },
     obs: { count: logs.obs.length, normal: logs.obs.length - flagged, flagged, tempMin: temps.length ? Math.min(...temps) : null, tempMax: temps.length ? Math.max(...temps) : null },
+    suction: { ...countSuctions(suctions), rows: suctions },
     weight: weights.find((w) => w.measured_on === date) ?? null,
     bars,
   }

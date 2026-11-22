@@ -9,7 +9,7 @@ import { useOutbox } from '../offline/outbox'
 import { pendingGiven, withPending } from '../offline/pending'
 import { loadAppointments, loadCareTaskLogs, loadPrescriptions, loadSupplies } from '../organise/api'
 
-const LOG_TABLES = ['feeds', 'nappies', 'medicine_given', 'notes', 'tube_changes', 'obs', 'exercise_logs', 'tummy_time'] as const
+const LOG_TABLES = ['feeds', 'nappies', 'medicine_given', 'notes', 'tube_changes', 'obs', 'exercise_logs', 'tummy_time', 'suctions'] as const
 
 /**
  * Everything the care screens need for today (UK midnight to midnight),
@@ -49,7 +49,8 @@ function useTodayData() {
     today,
     error,
     ready,
-    logs: logs.data ? withPending(logs.data, ops, me.id, from, to) : null,
+    // A copy saved on the phone before suctions existed has no list for them yet.
+    logs: logs.data ? withPending({ ...logs.data, suctions: logs.data.suctions ?? [] }, ops, me.id, from, to) : null,
     /** Given doses by scheduled time, for schedule status and the double-dose check. */
     scheduledGiven: [...(scheduledGiven.data ?? []), ...pendingGiven(ops, me.id)],
     plans: plans.data,

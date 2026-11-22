@@ -18,6 +18,7 @@ vi.mock('../care/api', async (orig) => {
     AlreadyGiven: real.AlreadyGiven,
     loadDayLogs: vi.fn(),
     loadLatestTube: vi.fn(),
+    loadSuctionsSince: vi.fn(async () => []),
     loadLatestObs: vi.fn(async () => null),
     loadWeights: vi.fn(async () => []),
     loadGivenBetween: vi.fn(),
@@ -60,6 +61,7 @@ beforeEach(() => {
     obs: [],
     exercises: [],
     tummy: [],
+    suctions: [],
   })
   care.loadGivenBetween.mockResolvedValue([ironGiven11])
   care.loadLatestTube.mockResolvedValue({ id: 't1', logged_by: 'm-dad', logged_at: '', nostril: 'left', inserted_at: '2026-11-28T09:00:00Z', retaped_at: null, note: null })

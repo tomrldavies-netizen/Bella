@@ -6,7 +6,9 @@ import { countdown } from '../care/countdown'
 import { describePlanned, feedTotals, nextPlannedFeed, plannedDayTotal } from '../care/feedLog'
 import { doseStatus, dosesForDay } from '../care/medSchedule'
 import { overdueItems, type OverdueItem } from '../care/overdue'
-import { EditEntrySheet, NappySheet, NoteSheet } from '../care/sheets/LogSheets'
+import { EditEntrySheet, NappySheet, NoteSheet, SuctionSheet } from '../care/sheets/LogSheets'
+import { suctionDetail, timesWord } from '../care/suction'
+import type { SuctionAmount, SuctionSite } from '../care/types'
 import { buildTimeline, type TimelineItem } from '../care/timeline'
 import { tubeStatus } from '../care/tube'
 import { obsDueAt, tempRangeOf } from '../care/obs'
@@ -173,13 +175,13 @@ function UpNext({ cards, loading }: { cards: UpNextCard[]; loading: boolean }) {
 }
 
 const tileClass =
-  'flex h-16 flex-col items-center justify-center gap-0.5 rounded-2xl border-[1.5px] border-line bg-card text-[13px] font-bold text-ink no-underline hover:text-ink md:h-[76px] md:text-sm md:font-extrabold'
+  'flex h-16 flex-col items-center justify-center gap-0.5 rounded-2xl px-1 text-center leading-tight border-[1.5px] border-line bg-card text-[13px] font-bold text-ink no-underline hover:text-ink md:h-[76px] md:text-sm md:font-extrabold'
 
-function QuickLog({ onNappy, onNote }: { onNappy: () => void; onNote: () => void }) {
+function QuickLog({ onNappy, onSuction, onNote }: { onNappy: () => void; onSuction: () => void; onNote: () => void }) {
   return (
     <section aria-labelledby="quick-log" className="flex flex-col gap-2">
       <SectionTitle id="quick-log">Quick log</SectionTitle>
-      <div className="grid grid-cols-3 gap-2.5 min-[1100px]:grid-cols-6">
+      <div className="grid grid-cols-4 gap-2 min-[1100px]:grid-cols-7 min-[1100px]:gap-2.5">
         <Link to="/feeds" className={tileClass}>
           <Elephant size={28} bg="#DCEBF2" />
           Feed
@@ -187,6 +189,10 @@ function QuickLog({ onNappy, onNote }: { onNappy: () => void; onNote: () => void
         <button type="button" className={tileClass} onClick={onNappy}>
           <Hippo size={28} bg="#ECE4F5" />
           Nappy
+        </button>
+        <button type="button" className={tileClass} onClick={onSuction}>
+          <Meerkat size={28} bg="#E3EFE4" />
+          Suction
         </button>
         <Link to="/meds" className={tileClass}>
           <LionCub size={28} bg="#FBE3D3" />
@@ -307,7 +313,7 @@ function Bar({ label, value, of, colour }: { label: string; value: string; of: n
 
 export function Today() {
   const t = useToday()
-  const [sheet, setSheet] = useState<'nappy' | 'note' | TimelineItem | null>(null)
+  const [sheet, setSheet] = useState<'nappy' | 'suction' | 'note' | TimelineItem | null>(null)
   const [toast, setToast] = useState<{ message: string; undo?: () => void } | null>(null)
   const closeSheet = useCallback(() => setSheet(null), [])
   const clearToast = useCallback(() => setToast(null), [])
@@ -398,6 +404,26 @@ export function Today() {
   const wet = logs?.nappies.filter((n) => n.wet).length ?? 0
   const dirty = logs?.nappies.filter((n) => n.dirty).length ?? 0
 
+  const suctionsToday = logs?.suctions.length ?? 0
+
+  async function logSuction(amount: SuctionAmount, site: SuctionSite | null) {
+    setSheet(null)
+    try {
+      const id = await addLog('suctions', t.householdId, { amount, site })
+      t.reload()
+      setToast({
+        message: `Suction logged · ${suctionDetail({ amount, site })}`,
+        undo: async () => {
+          setToast(null)
+          await deleteLog('suctions', id)
+          t.reload()
+        },
+      })
+    } catch (e) {
+      setToast({ message: `Couldn't log the suction: ${e instanceof Error ? e.message : String(e)}` })
+    }
+  }
+
   async function logNappy(wetN: boolean, dirtyN: boolean) {
     setSheet(null)
     try {
@@ -430,7 +456,7 @@ export function Today() {
           <PlanChangedBanner />
           {t.ready && <OverduePanel items={overdueItems(t)} />}
           <UpNext cards={cards} loading={!t.ready} />
-          <QuickLog onNappy={() => setSheet('nappy')} onNote={() => setSheet('note')} />
+          <QuickLog onNappy={() => setSheet('nappy')} onSuction={() => setSheet('suction')} onNote={() => setSheet('note')} />
           <Timeline items={items} loading={!t.ready} onOpen={setSheet} />
         </div>
         <aside className="hidden flex-col gap-3.5 md:flex">
@@ -444,6 +470,10 @@ export function Today() {
               <span>
                 {wet} wet · {dirty} dirty
               </span>
+            </div>
+            <div className="flex justify-between text-sm font-bold">
+              <span>Suction</span>
+              <span>{timesWord(suctionsToday)}</span>
             </div>
           </section>
           <Link to="/plan" className="flex flex-col gap-1 rounded-[22px] bg-plan px-[18px] py-4 text-ink no-underline hover:text-ink">
@@ -481,6 +511,7 @@ export function Today() {
       </div>
 
       {sheet === 'nappy' && <NappySheet onLog={logNappy} onClose={closeSheet} />}
+      {sheet === 'suction' && <SuctionSheet onLog={logSuction} onClose={closeSheet} />}
       {sheet === 'note' && (
         <NoteSheet
           onClose={closeSheet}

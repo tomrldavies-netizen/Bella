@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabase'
 import { friendlyError } from '../offline/network'
 import { newId, runOrQueue } from '../offline/outbox'
-import type { ExerciseLog, FeedLog, GivenLog, NappyLog, NoteLog, ObsLog, TubeChange, TummyLog, WeightLog } from './types'
+import type { ExerciseLog, FeedLog, GivenLog, NappyLog, NoteLog, ObsLog, SuctionLog, TubeChange, TummyLog, WeightLog } from './types'
 
 function db() {
   if (!supabase) throw new Error('Not connected')
@@ -13,7 +13,7 @@ function check<T>(res: { data: T | null; error: { message: string; details?: str
   return res.data as T
 }
 
-export type LogTable = 'feeds' | 'nappies' | 'medicine_given' | 'tube_changes' | 'notes' | 'obs' | 'exercise_logs' | 'tummy_time' | 'weights'
+export type LogTable = 'feeds' | 'nappies' | 'medicine_given' | 'tube_changes' | 'notes' | 'obs' | 'exercise_logs' | 'tummy_time' | 'weights' | 'suctions'
 
 export type DayLogs = {
   feeds: FeedLog[]
@@ -24,6 +24,7 @@ export type DayLogs = {
   obs: ObsLog[]
   exercises: ExerciseLog[]
   tummy: TummyLog[]
+  suctions: SuctionLog[]
 }
 
 const num = <T extends object>(row: T, keys: (keyof T)[]): T => {
@@ -36,7 +37,7 @@ const num = <T extends object>(row: T, keys: (keyof T)[]): T => {
 export async function loadDayLogs(householdId: string, fromIso: string, toIso: string): Promise<DayLogs> {
   const q = (table: LogTable) =>
     db().from(table).select('*').eq('household_id', householdId).gte('logged_at', fromIso).lt('logged_at', toIso).order('logged_at', { ascending: false })
-  const [feeds, nappies, given, notes, tubeChanges, obs, exercises, tummy] = await Promise.all([
+  const [feeds, nappies, given, notes, tubeChanges, obs, exercises, tummy, suctions] = await Promise.all([
     q('feeds'),
     q('nappies'),
     q('medicine_given'),
@@ -45,6 +46,7 @@ export async function loadDayLogs(householdId: string, fromIso: string, toIso: s
     q('obs'),
     q('exercise_logs'),
     q('tummy_time'),
+    q('suctions'),
   ])
   return {
     feeds: check<FeedLog[]>(feeds).map((f) => num(f, ['oral_ml', 'tube_ml'])),
@@ -55,7 +57,15 @@ export async function loadDayLogs(householdId: string, fromIso: string, toIso: s
     obs: check<ObsLog[]>(obs).map((o) => num(o, ['temperature_c'])),
     exercises: check<ExerciseLog[]>(exercises),
     tummy: check<TummyLog[]>(tummy),
+    suctions: check<SuctionLog[]>(suctions),
   }
+}
+
+/** Suctions since an instant (for the Care tab's history), newest first. */
+export async function loadSuctionsSince(householdId: string, fromIso: string): Promise<SuctionLog[]> {
+  return check<SuctionLog[]>(
+    await db().from('suctions').select('*').eq('household_id', householdId).gte('logged_at', fromIso).order('logged_at', { ascending: false }),
+  )
 }
 
 /** The most recent obs ever (for "obs due"). */

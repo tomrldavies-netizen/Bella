@@ -21,6 +21,10 @@ export type FeedLog = {
 
 export type NappyLog = { id: string; logged_by: string; logged_at: string; wet: boolean; dirty: boolean; note: string | null }
 
+export type SuctionAmount = 'little' | 'medium' | 'lot'
+export type SuctionSite = 'nose' | 'mouth' | 'both'
+export type SuctionLog = { id: string; logged_by: string; logged_at: string; amount: SuctionAmount; site: SuctionSite | null; note: string | null }
+
 export type GivenLog = {
   id: string
   logged_by: string

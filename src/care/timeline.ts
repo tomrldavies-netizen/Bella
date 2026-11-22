@@ -3,6 +3,7 @@ import type { Exercise, Medicine } from '../plan/api'
 import { describeObs, obsConcerns, type TempRange } from './obs'
 import type { DayLogs } from './api'
 import { describeFeed } from './feedLog'
+import { suctionText } from './suction'
 
 export type TimelineEntry =
   | { kind: 'feed'; row: DayLogs['feeds'][number] }
@@ -13,6 +14,7 @@ export type TimelineEntry =
   | { kind: 'obs'; row: DayLogs['obs'][number] }
   | { kind: 'exercise'; row: DayLogs['exercises'][number] }
   | { kind: 'tummy'; row: DayLogs['tummy'][number] }
+  | { kind: 'suction'; row: DayLogs['suctions'][number] }
 
 export type TimelineItem = {
   key: string
@@ -29,7 +31,7 @@ export type TimelineItem = {
   pending: boolean
 }
 
-export const DOT = { feed: '#7FA9C1', nappy: '#A994C4', given: '#E9A06B', note: '#D9B45A', tube: '#6FA89F', obs: '#8DB596', exercise: '#B5677D', speech: '#6FA89F', tummy: '#D98CA0' } as const
+export const DOT = { feed: '#7FA9C1', nappy: '#A994C4', given: '#E9A06B', note: '#D9B45A', tube: '#6FA89F', obs: '#8DB596', exercise: '#B5677D', speech: '#6FA89F', tummy: '#D98CA0', suction: '#4F7F5A' } as const
 
 export function nappyText(wet: boolean, dirty: boolean): string {
   return `Nappy · ${wet && dirty ? 'wet and dirty' : wet ? 'wet' : 'dirty'}`
@@ -66,6 +68,7 @@ export function buildTimeline(logs: DayLogs, medicines: Medicine[], exercises: E
       return { entry: { kind: 'exercise' as const, row }, text: `${ex?.name ?? 'Exercise'} done`, colour: ex?.type === 'speech_language' ? DOT.speech : DOT.exercise, flagged: false }
     }),
     ...logs.tummy.map((row) => ({ entry: { kind: 'tummy' as const, row }, text: `Tummy time ${row.duration_min} min`, colour: DOT.tummy, flagged: false })),
+    ...logs.suctions.map((row) => ({ entry: { kind: 'suction' as const, row }, text: suctionText(row), colour: DOT.suction, flagged: false })),
   ].map((i) => ({
     ...i,
     key: `${i.entry.kind}:${i.entry.row.id}`,

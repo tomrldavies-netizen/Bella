@@ -19,6 +19,7 @@ vi.mock('../care/api', async (orig) => {
     AlreadyGiven: real.AlreadyGiven,
     loadDayLogs: vi.fn(),
     loadLatestTube: vi.fn(async () => null),
+    loadSuctionsSince: vi.fn(async () => []),
     loadLatestObs: vi.fn(async () => null),
     loadGivenBetween: vi.fn(),
     loadWeights: vi.fn(async () => []),
@@ -42,7 +43,7 @@ const vit: planApi.Medicine = {
   id: 'vit', name: 'Vitamin drops', notes: null, active: true, sort_order: 1,
   versions: [{ id: 'v', dose: 0.5, unit: 'ml', route: 'mouth', times: ['09:00'], effective_from: '2026-10-01T00:00:00Z', effective_to: null, reason: null }],
 }
-const emptyDay = { feeds: [], nappies: [], given: [], notes: [], tubeChanges: [], obs: [], exercises: [], tummy: [] }
+const emptyDay = { feeds: [], nappies: [], given: [], notes: [], tubeChanges: [], obs: [], exercises: [], tummy: [], suctions: [] }
 
 let user: ReturnType<typeof userEvent.setup>
 beforeEach(() => {
@@ -150,6 +151,7 @@ describe('Daily summary', () => {
       nappies: [{ id: 'n', logged_by: 'm-dad', logged_at: '2026-12-03T19:40:00Z', wet: true, dirty: true, note: null }],
       obs: [{ id: 'o', logged_by: 'm-dad', logged_at: '2026-12-03T10:00:00Z', temperature_c: 37.9, breathing: 'normal', sleep: 'settled', note: null }],
       tummy: [{ id: 't', logged_by: 'm-dad', logged_at: '2026-12-03T15:00:00Z', duration_min: 12 }],
+      suctions: [],
       notes: [{ id: 'x', logged_by: 'm-dad', logged_at: '2026-12-03T18:00:00Z', text: 'Best bottle so far' }],
     })
     renderRoutes('/summary')

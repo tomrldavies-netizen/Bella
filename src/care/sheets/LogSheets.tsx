@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Hippo } from '../../animals'
+import { Hippo, Meerkat } from '../../animals'
 import { AmountStepper } from '../../components/AmountStepper'
 import { BottomSheet, ChoiceButton } from '../../components/BottomSheet'
 import { ErrorNote } from '../../components/Field'
@@ -17,6 +17,8 @@ import type { TimelineEntry } from '../timeline'
 import { ObsForm } from '../ObsForm'
 import { obsRow, type ObsDraft } from '../obsDraft'
 import type { TempRange } from '../obs'
+import { SUCTION_AMOUNTS, SUCTION_SITES } from '../suction'
+import type { SuctionAmount, SuctionSite } from '../types'
 
 const label = 'text-[13px] font-extrabold'
 const saveBtn = 'h-12 w-full rounded-full bg-primary text-base font-extrabold text-white disabled:opacity-50'
@@ -31,6 +33,50 @@ export function NappySheet({ onLog, onClose }: { onLog: (wet: boolean, dirty: bo
         <ChoiceButton label="Wet" onClick={() => onLog(true, false)} className="bg-nappies" icon={<Hippo size={30} />} />
         <ChoiceButton label="Dirty" onClick={() => onLog(false, true)} className="bg-nappies" icon={<Hippo size={30} />} />
         <ChoiceButton label="Both" onClick={() => onLog(true, true)} className="bg-nappies" icon={<Hippo size={30} />} />
+      </div>
+      <p className="m-0 text-xs text-ink-muted">Logged as now. Tap it in Today's list to change the time or add a note.</p>
+    </BottomSheet>
+  )
+}
+
+/** Nose / Mouth / Both, optional: tap the chosen one again to clear it. */
+function SitePicker({ value, onChange }: { value: SuctionSite | null; onChange: (s: SuctionSite | null) => void }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span id="suction-site" className={label}>
+        Where <span className="font-bold text-ink-muted">(optional)</span>
+      </span>
+      <div role="group" aria-labelledby="suction-site" className="flex gap-2">
+        {SUCTION_SITES.map((s) => {
+          const on = value === s.value
+          return (
+            <button
+              key={s.value}
+              type="button"
+              aria-pressed={on}
+              onClick={() => onChange(on ? null : s.value)}
+              className={`min-h-11 flex-1 rounded-xl border-[1.5px] text-[13px] font-extrabold ${on ? 'border-obs-accent bg-obs' : 'border-line bg-card text-ink-deep'}`}
+            >
+              {s.label}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+/** Like the nappy sheet: pick where (optional), then one tap on how much logs it now. */
+export function SuctionSheet({ onLog, onClose }: { onLog: (amount: SuctionAmount, site: SuctionSite | null) => void; onClose: () => void }) {
+  const [site, setSite] = useState<SuctionSite | null>(null)
+  return (
+    <BottomSheet title="Suction" onClose={onClose}>
+      <SitePicker value={site} onChange={setSite} />
+      <span className={label}>How much came out?</span>
+      <div className="flex gap-2.5">
+        {SUCTION_AMOUNTS.map((a) => (
+          <ChoiceButton key={a.value} label={a.label} onClick={() => onLog(a.value, site)} className="bg-obs" icon={<Meerkat size={30} />} />
+        ))}
       </div>
       <p className="m-0 text-xs text-ink-muted">Logged as now. Tap it in Today's list to change the time or add a note.</p>
     </BottomSheet>
@@ -81,6 +127,7 @@ const TABLE: Record<TimelineEntry['kind'], LogTable> = {
   obs: 'obs',
   exercise: 'exercise_logs',
   tummy: 'tummy_time',
+  suction: 'suctions',
 }
 const TITLE: Record<TimelineEntry['kind'], string> = {
   feed: 'Edit feed',
@@ -91,6 +138,7 @@ const TITLE: Record<TimelineEntry['kind'], string> = {
   obs: 'Edit obs',
   exercise: 'Edit exercise',
   tummy: 'Edit tummy time',
+  suction: 'Edit suction',
 }
 
 /** Tap a timeline entry to edit or delete it (SPEC §4.1). */
@@ -123,7 +171,10 @@ export function EditEntrySheet({
 
   // Per-kind drafts
   const [nappy, setNappy] = useState(entry.kind === 'nappy' ? { wet: entry.row.wet, dirty: entry.row.dirty } : { wet: true, dirty: false })
-  const [text, setText] = useState(entry.kind === 'note' ? entry.row.text : '')
+  const [text, setText] = useState(entry.kind === 'note' ? entry.row.text : entry.kind === 'suction' ? (entry.row.note ?? '') : '')
+  const [suction, setSuction] = useState<{ amount: SuctionAmount; site: SuctionSite | null }>(
+    entry.kind === 'suction' ? { amount: entry.row.amount, site: entry.row.site } : { amount: 'medium', site: null },
+  )
   const [dose, setDose] = useState(entry.kind === 'given' ? (entry.row.dose_given ?? 0) : 0)
   const [obs, setObs] = useState<ObsDraft>(() =>
     entry.kind === 'obs'
@@ -170,6 +221,8 @@ export function EditEntrySheet({
         return { logged_at: loggedAt }
       case 'tummy':
         return { logged_at: loggedAt, duration_min: minutes }
+      case 'suction':
+        return { logged_at: loggedAt, ...suction, note: text.trim() || null }
     }
   }
 
@@ -212,6 +265,21 @@ export function EditEntrySheet({
           <span className={label}>Tummy time</span>
           <AmountStepper label="Minutes" value={minutes} onChange={setMinutes} step={1} min={0} max={240} unit="min" />
         </div>
+      )}
+      {entry.kind === 'suction' && (
+        <>
+          <Segmented label="How much came out" value={suction.amount} onChange={(amount) => setSuction({ ...suction, amount })} options={SUCTION_AMOUNTS} accent="border-obs-accent" />
+          <SitePicker value={suction.site} onChange={(site) => setSuction({ ...suction, site })} />
+          <textarea
+            aria-label="Note"
+            placeholder="Note (optional)"
+            value={text}
+            rows={2}
+            maxLength={4000}
+            onChange={(e) => setText(e.target.value)}
+            className="w-full rounded-xl border-[1.5px] border-line bg-field p-3 text-[15px]"
+          />
+        </>
       )}
       {entry.kind === 'tube' && (
         <Segmented

@@ -12,6 +12,7 @@ import { useLiveQuery } from '../lib/useLiveQuery'
 import { useNow } from '../lib/useNow'
 import { addDaysIso, formatNumber, ukNow, ukParts, ukToIso } from '../lib/ukTime'
 import { daySummary, type FeedBar } from '../organise/summary'
+import { describeCounts, suctionDetail, timesWord } from '../care/suction'
 import { loadFeedPlans, loadMedicines, loadRoutines } from '../plan/api'
 
 function longDay(date: string) {
@@ -67,7 +68,7 @@ export function Summary() {
   const from = ukToIso(date, '00:00')
   const to = ukToIso(addDaysIso(date, 1), '00:00')
 
-  const logs = useLiveQuery(hid, ['feeds', 'nappies', 'medicine_given', 'notes', 'obs', 'exercise_logs', 'tummy_time', 'tube_changes'], (h) => loadDayLogs(h, from, to), date)
+  const logs = useLiveQuery(hid, ['feeds', 'nappies', 'medicine_given', 'notes', 'obs', 'exercise_logs', 'tummy_time', 'tube_changes', 'suctions'], (h) => loadDayLogs(h, from, to), date)
   const given = useLiveQuery(hid, ['medicine_given'], (h) => loadGivenBetween(h, from, to), date)
   const plans = useLiveQuery(hid, ['feed_plans'], loadFeedPlans)
   const meds = useLiveQuery(hid, ['medicines', 'medicine_doses'], loadMedicines)
@@ -125,6 +126,7 @@ export function Summary() {
                 sub={s.sick.large ? `${s.sick.large} large` : 'no large vomits'}
                 alert={s.sick.large > 0}
               />
+              <Tile k="SUCTION" v={timesWord(s.suction.total)} sub={s.suction.total ? describeCounts(s.suction) : 'none logged'} />
               {s.weight && <Tile k="WEIGHT" v={formatKg(s.weight.weight_g)} sub="weighed this day" />}
             </section>
 
@@ -159,6 +161,31 @@ export function Summary() {
                 )}
               </span>
             </Card>
+
+            {s.suction.total > 0 && (
+              <section aria-labelledby="suction-times" className="flex flex-col gap-2">
+                <h2 id="suction-times" className="m-0 text-lg font-bold">
+                  Suction
+                </h2>
+                <Card className="flex flex-col px-4 py-1">
+                  <ul className="m-0 flex list-none flex-col p-0">
+                    {s.suction.rows.map((r) => {
+                      const m = who(r.logged_by)
+                      return (
+                        <li key={r.id} className="flex items-center gap-3 border-b border-line-soft py-2.5 last:border-0">
+                          <span className="w-12 text-sm font-extrabold tabular-nums">{ukParts(r.logged_at).time}</span>
+                          <span className="flex min-w-0 flex-1 flex-col">
+                            <span className="text-sm font-bold">{suctionDetail(r).replace(/^./, (c) => c.toUpperCase())}</span>
+                            {r.note && <span className="text-xs text-ink-muted">{r.note}</span>}
+                          </span>
+                          {m && <NamePill member={m} />}
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </Card>
+              </section>
+            )}
 
             <section aria-labelledby="notes" className="flex flex-col gap-2">
               <h2 id="notes" className="m-0 text-lg font-bold">

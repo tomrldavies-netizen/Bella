@@ -13,6 +13,7 @@ describe('timeline', () => {
         obs: [{ id: 'o', logged_by: 'm1', logged_at: '2026-12-04T20:30:00Z', temperature_c: 38.1, breathing: 'normal', sleep: 'settled', note: null }],
         exercises: [],
         tummy: [{ id: 't', logged_by: 'm2', logged_at: '2026-12-04T19:20:00Z', duration_min: 6 }],
+        suctions: [],
       },
       [{ id: 'v', name: 'Vitamin drops', notes: null, active: true, sort_order: 1, versions: [] }],
       [],

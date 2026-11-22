@@ -3,7 +3,7 @@ import type { DayLogs } from '../care/api'
 import type { OutboxOp } from './outbox'
 import { pendingGiven, withPending } from './pending'
 
-const empty: DayLogs = { feeds: [], nappies: [], given: [], notes: [], tubeChanges: [], obs: [], exercises: [], tummy: [] }
+const empty: DayLogs = { feeds: [], nappies: [], given: [], notes: [], tubeChanges: [], obs: [], exercises: [], tummy: [], suctions: [] }
 const day = ['2026-12-04T00:00:00.000Z', '2026-12-05T00:00:00.000Z'] as const
 
 describe('changes waiting to sync', () => {

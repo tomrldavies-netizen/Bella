@@ -4,6 +4,7 @@ import { addLog } from '../care/api'
 import { obsDueAt, tempRangeOf } from '../care/obs'
 import { ObsForm } from '../care/ObsForm'
 import { obsDraftFrom, obsRow, type ObsDraft } from '../care/obsDraft'
+import { SuctionCard } from '../care/SuctionCard'
 import { formatElapsed, useTimer } from '../care/useTimer'
 import { useToday } from '../care/useToday'
 import { AmountStepper } from '../components/AmountStepper'
@@ -181,6 +182,8 @@ export function Care() {
             {saving ? 'Saving…' : 'Save obs'}
           </button>
         </Card>
+
+        <SuctionCard />
 
         {t.ready && active.length === 0 && (
           <Card className="px-4 py-3.5">

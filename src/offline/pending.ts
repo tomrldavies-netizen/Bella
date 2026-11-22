@@ -13,6 +13,7 @@ const KEY: Record<string, keyof DayLogs> = {
   tummy_time: 'tummy',
   tube_changes: 'tubeChanges',
   medicine_given: 'given',
+  suctions: 'suctions',
 }
 
 function givenRow(op: Extract<OutboxOp, { kind: 'give' }>, memberId: string): GivenLog & Pending {

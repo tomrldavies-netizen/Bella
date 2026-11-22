@@ -20,6 +20,7 @@ vi.mock('../care/api', async (orig) => {
     AlreadyGiven: real.AlreadyGiven,
     loadDayLogs: vi.fn(),
     loadLatestTube: vi.fn(async () => null),
+    loadSuctionsSince: vi.fn(async () => []),
     loadLatestObs: vi.fn(async () => null),
     loadGivenBetween: vi.fn(async () => []),
     loadWeights: vi.fn(async () => []),
@@ -56,7 +57,7 @@ beforeEach(() => {
   plan.loadFeedPlans.mockResolvedValue([{ id: 'p', effective_from: '2026-11-01T00:00:00Z', note: null, created_by: 'm-dad', slots: [{ id: 's1', time: '12:00', milk: 'formula', ml: 55 }, { id: 's2', time: '15:00', milk: 'formula', ml: 55 }] }])
   plan.loadMedicines.mockResolvedValue([{ id: 'iron', name: 'Iron', notes: null, active: true, sort_order: 1, versions: [{ id: 'v', dose: 1.2, unit: 'ml', route: 'either', times: ['12:30', '18:00'], effective_from: '2026-11-01T00:00:00Z', effective_to: null, reason: null }] }])
   plan.loadRoutines.mockResolvedValue({ obsIntervalMin: null, tummyGoalMin: 30, tubeChangeDays: null, tempMinC: null, tempMaxC: null, tasks: [] })
-  care.loadDayLogs.mockResolvedValue({ feeds: [], nappies: [], given: [], notes: [], tubeChanges: [], obs: [], exercises: [], tummy: [] })
+  care.loadDayLogs.mockResolvedValue({ feeds: [], nappies: [], given: [], notes: [], tubeChanges: [], obs: [], exercises: [], tummy: [], suctions: [] })
   alarms.loadMyAlarms.mockResolvedValue([])
 })
 afterEach(() => vi.useRealTimers())

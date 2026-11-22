@@ -13,7 +13,7 @@ const base = {
   lastObs: { id: 'o', logged_by: 'm', logged_at: '2026-12-04T08:30:00Z', temperature_c: 36.8, breathing: 'normal' as const, sleep: 'settled' as const, note: null },
   tube: { id: 't', logged_by: 'm', logged_at: '', nostril: 'left' as const, inserted_at: '2026-11-26T10:00:00Z', retaped_at: null, note: null },
   careTaskLogs: [],
-  logs: { feeds: [{ id: 'f', logged_by: 'm', logged_at: '2026-12-04T09:05:00Z', feed_plan_slot_id: null, started_at: null, ended_at: null, method: 'tube' as const, oral_ml: 0, tube_ml: 55, milk_type: 'formula' as const, fortified: false, sick_level: 'none' as const, note: null }], nappies: [], given: [], notes: [], tubeChanges: [], obs: [], exercises: [], tummy: [] },
+  logs: { feeds: [{ id: 'f', logged_by: 'm', logged_at: '2026-12-04T09:05:00Z', feed_plan_slot_id: null, started_at: null, ended_at: null, method: 'tube' as const, oral_ml: 0, tube_ml: 55, milk_type: 'formula' as const, fortified: false, sick_level: 'none' as const, note: null }], nappies: [], given: [], notes: [], tubeChanges: [], obs: [], exercises: [], tummy: [], suctions: [] },
 }
 
 describe('overdue', () => {

@@ -51,6 +51,12 @@ Helpers are in `src/lib/ukTime.ts` and `src/lib/age.ts`, and `app.uk()` in SQL.
 care tasks). Today shows them at the top: amber "Due now" from the due time, red "Overdue" once 15 minutes late,
 with how late and a button to log it. The tabs get a red dot and the home-screen icon a badge count where supported.
 
+## Suction
+
+`suctions` is a log table like `nappies`: amount (a little / medium / a lot), where (nose / mouth / both, optional) and a note.
+Logged from Today's Quick log or the Care tab. It shows in Today's timeline, the Daily summary (count and times) and
+the Care tab's Suction card (7-day chart and history by day, tap to edit).
+
 ## Offline
 
 - The service worker keeps the app on the phone; `src/offline/cache.ts` keeps the last-loaded data, so it opens with no signal.

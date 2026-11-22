@@ -18,6 +18,7 @@ vi.mock('../care/api', async (orig) => {
     AlreadyGiven: real.AlreadyGiven,
     loadDayLogs: vi.fn(),
     loadLatestTube: vi.fn(async () => null),
+    loadSuctionsSince: vi.fn(async () => []),
     loadLatestObs: vi.fn(),
     loadGivenBetween: vi.fn(async () => []),
     loadWeights: vi.fn(),
@@ -54,6 +55,7 @@ beforeEach(() => {
       { id: 'e2', logged_by: 'm-dad', logged_at: '2026-10-31T15:00:00Z', exercise_id: 'hip' },
     ],
     tummy: [{ id: 't1', logged_by: 'm-dad', logged_at: '2026-10-31T19:20:00Z', duration_min: 12 }],
+    suctions: [],
   })
   care.loadLatestObs.mockResolvedValue({ id: 'o1', logged_by: 'm-dad', logged_at: '2026-10-31T20:30:00Z', temperature_c: 36.8, breathing: 'normal', sleep: 'settled', note: null })
   care.loadWeights.mockResolvedValue([
